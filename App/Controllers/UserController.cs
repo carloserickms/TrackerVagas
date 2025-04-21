@@ -49,7 +49,7 @@ namespace App.Controllers
             }
         }
 
-        [HttpDelete("delete-user")]
+        [HttpDelete("delete-account")]
         [Authorize]
         public async Task<ActionResult> DeleteAccount()
         {
