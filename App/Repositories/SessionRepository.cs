@@ -23,7 +23,7 @@ namespace App.Repositories
 
         public override async Task<Session> GetById(Guid id)
         {
-            return await _context.Session.FirstOrDefaultAsync(u => u.Id == id);
+            return await _context.Session.FirstOrDefaultAsync(u => u.UserId == id);
         }
     }
 }
