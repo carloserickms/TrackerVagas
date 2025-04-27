@@ -35,10 +35,12 @@ namespace App.Controllers
         }
 
         [HttpPost("login-account")]
-        public async Task<ActionResult> LoginAccount([FromBody] UserDTO userDTO)
+        public async Task<ActionResult> LoginAccount([FromBody] UserSignInDTO userDTO)
         {
             try
             {
+                Console.WriteLine(">>>>>" + userDTO.email);
+
                 var response = await _authService.SingIn(userDTO);
 
                 return response.Success ? Ok(response) : BadRequest(response);
