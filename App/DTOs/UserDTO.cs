@@ -6,16 +6,16 @@ namespace App.DTOs
     {
         [Required]
         [MaxLength(20)]
-        public string UserName { get; set; }
+        public string userName { get; set; }
         [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        public string email { get; set; }
         [Required]
         [MinLength(8)]
-        public string Password { get; set; }
+        public string password { get; set; }
         [Required]
         [MinLength(8)]
-        public string RePassword { get; set; }
+        public string rePassword { get; set; }
     }
 
 }
