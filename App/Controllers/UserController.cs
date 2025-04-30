@@ -39,8 +39,6 @@ namespace App.Controllers
         {
             try
             {
-                Console.WriteLine(">>>>>" + userDTO.email);
-
                 var response = await _authService.SingIn(userDTO);
 
                 return response.Success ? Ok(response) : BadRequest(response);
