@@ -8,8 +8,8 @@ namespace App.Service
     public class UserProfileService
     {
         private readonly IUserRepository _userRepository;
-        private readonly IResponseBuilder<User> _responseBuilder;
-        public UserProfileService(IUserRepository userRepository, IResponseBuilder<User> responseBuilder)
+        private readonly IResponseBuilder _responseBuilder;
+        public UserProfileService(IUserRepository userRepository, IResponseBuilder responseBuilder)
         {
             _userRepository = userRepository;
             _responseBuilder = responseBuilder;
@@ -30,7 +30,7 @@ namespace App.Service
                     {
                         Success = false,
                         Message = "Usuario não encontrado!",
-                        Date = null
+                        Data = null
                     };
                 }
 
@@ -40,17 +40,12 @@ namespace App.Service
                 {
                     Success = true,
                     Message = "Usuario deletado com sucesso!",
-                    Date = user
+                    Data = user
                 };
             }
             catch (Exception ex)
             {
-                return new ResponseDTO
-                {
-                    Success = false,
-                    Message = $"Ocorreu um erro interno: {ex.Message}",
-                    Date = null
-                };
+                return _responseBuilder.InternalError( $"Ocorreu um erro interno: {ex.Message}");
             }
         }
 
@@ -76,16 +71,11 @@ namespace App.Service
 
                 await _userRepository.Change();
 
-                return _responseBuilder.OK(null, "Informações alteradas com sucesso!");
+                return _responseBuilder.OKNoObject("Informações alteradas com sucesso!");
             }
             catch (Exception ex)
             {
-                return new ResponseDTO
-                {
-                    Success = false,
-                    Message = $"Ocorreu um erro interno: {ex.Message}",
-                    Date = null
-                };
+                return _responseBuilder.InternalError( $"Ocorreu um erro interno: {ex.Message}");
             }
         }
     }

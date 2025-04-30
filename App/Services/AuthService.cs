@@ -9,16 +9,14 @@ namespace App.Service
     {
         private readonly IUserRepository _userRepository;
         private readonly ISessionRepository _sessionRepository;
-        private readonly IResponseBuilder<UserLoginDTO> _responseBuilderLogin;
-        private readonly IResponseBuilder<User> _responseBuilderAuth;
+        private readonly IResponseBuilder _responseBuilder;
 
         public AuthService(IUserRepository userRepository, ISessionRepository sessionRepository,
-                IResponseBuilder<UserLoginDTO> responseBuilderLogin, IResponseBuilder<User> responseBuilderAuth)
+                IResponseBuilder responseBuilder)
         {
             _userRepository = userRepository;
-            _responseBuilderLogin = responseBuilderLogin;
+            _responseBuilder = responseBuilder;
             _sessionRepository = sessionRepository;
-            _responseBuilderAuth = responseBuilderAuth;
         }
 
 
@@ -30,12 +28,12 @@ namespace App.Service
 
                 if (user != null)
                 {
-                    return _responseBuilderAuth.Conflict("O email inserido já possui cadastro.");
+                    return _responseBuilder.Conflict("O email inserido já possui cadastro.");
                 }
 
                 if (userDTO.password != userDTO.rePassword)
                 {
-                    return _responseBuilderAuth.Conflict("As senhas inseridas não coincidem, verifique e tente novamente.");
+                    return _responseBuilder.Conflict("As senhas inseridas não coincidem, verifique e tente novamente.");
                 }
 
                 User newUser = new()
@@ -47,16 +45,11 @@ namespace App.Service
 
                 await _userRepository.Add(newUser);
 
-                return _responseBuilderAuth.OK(newUser, "Cadastro feito com sucesso.");
+                return _responseBuilder.OKNoObject("Cadastro feito com sucesso.");
             }
             catch (Exception ex)
             {
-                return new ResponseDTO
-                {
-                    Success = false,
-                    Message = $"Ocorreu um erro interno: {ex.Message}",
-                    Date = null
-                };
+                return _responseBuilder.InternalError( $"Ocorreu um erro interno: {ex.Message}");
             }
         }
 
@@ -65,8 +58,6 @@ namespace App.Service
             Session session = new() { };
             UserLoginDTO userLogin = new();
 
-            Console.WriteLine(userDTO.email);
-
             try
             {
                 var user = await _userRepository.GetByEmail(userDTO.email);
@@ -74,12 +65,12 @@ namespace App.Service
 
                 if (user == null)
                 {
-                    return _responseBuilderLogin.NotFound("Email enserido não encontrado, Verifique e tente novamente.");
+                    return _responseBuilder.NotFound("Email enserido não encontrado, Verifique e tente novamente.");
                 }
 
                 if (!BCrypt.Net.BCrypt.Verify(userDTO.password, user.Password))
                 {
-                    return _responseBuilderLogin.Conflict("Senha invalida");
+                    return _responseBuilder.Conflict("Senha invalida");
                 }
 
                 var token = TokenService.GenerateToken(user);
@@ -106,20 +97,15 @@ namespace App.Service
                         UpdatedAt = user.UpdatedAt
                     };
 
-                    return _responseBuilderLogin.OK(userLogin, "Usuário foi logado com sucesso!");
+                    return _responseBuilder.OK(userLogin, "Usuário foi logado com sucesso!");
                 }
 
-            return _responseBuilderLogin.OK(user, "Usuário foi logado com sucesso!");
+            return _responseBuilder.OK(user, "Usuário foi logado com sucesso!");
             
             }
             catch (Exception ex)
             {
-                return new ResponseDTO
-                {
-                    Success = false,
-                    Message = $"Ocorreu um erro interno: {ex.Message}",
-                    Date = null
-                };
+                return _responseBuilder.InternalError( $"Ocorreu um erro interno: {ex.Message}");
             }
         }
     }
