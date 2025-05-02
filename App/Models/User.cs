@@ -27,6 +27,8 @@ namespace App.Models
 
         public Session Session {get; set;}
 
+        public MetaInfo MetaInfo {get; set;}
+
 
         public User() : base(Guid.NewGuid(), DateTime.Now, DateTime.Now)
         {
