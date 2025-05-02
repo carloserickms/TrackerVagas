@@ -9,14 +9,16 @@ namespace App.Service
     {
         private readonly IUserRepository _userRepository;
         private readonly ISessionRepository _sessionRepository;
+        private readonly IMetaInfoRepository _metaInfoRepository;
         private readonly IResponseBuilder _responseBuilder;
 
         public AuthService(IUserRepository userRepository, ISessionRepository sessionRepository,
-                IResponseBuilder responseBuilder)
+                IResponseBuilder responseBuilder, IMetaInfoRepository metaInfoRepository)
         {
             _userRepository = userRepository;
             _responseBuilder = responseBuilder;
             _sessionRepository = sessionRepository;
+            _metaInfoRepository = metaInfoRepository;
         }
 
 
@@ -24,9 +26,15 @@ namespace App.Service
         {
             try
             {
-                var user = await _userRepository.GetByEmail(userDTO.email);
+                if (userDTO.provider == "google")
+                {
+                    string randomString = RandomGenerator.GenerateRandomString(12);
+                    userDTO.password = randomString;
+                    userDTO.rePassword = randomString;
+                }
 
-                if (user != null)
+                var existingUser = await _userRepository.GetByEmail(userDTO.email);
+                if (existingUser != null)
                 {
                     return _responseBuilder.Conflict("O email inserido já possui cadastro.");
                 }
@@ -45,13 +53,24 @@ namespace App.Service
 
                 await _userRepository.Add(newUser);
 
+                if (userDTO.provider == "google")
+                {
+                    MetaInfo metaInfo = new(userDTO.providerId, userDTO.provider)
+                    {
+                        UserId = newUser.Id
+                    };
+
+                    await _metaInfoRepository.Add(metaInfo);
+                }
+
                 return _responseBuilder.OKNoObject("Cadastro feito com sucesso.");
             }
             catch (Exception ex)
             {
-                return _responseBuilder.InternalError( $"Ocorreu um erro interno: {ex.Message}");
+                return _responseBuilder.InternalError($"Ocorreu um erro interno: {ex.Message}");
             }
         }
+
 
         public async Task<ResponseDTO> SingIn(UserSignInDTO userDTO)
         {
@@ -100,12 +119,12 @@ namespace App.Service
                     return _responseBuilder.OK(userLogin, "Usuário foi logado com sucesso!");
                 }
 
-            return _responseBuilder.OK(user, "Usuário foi logado com sucesso!");
-            
+                return _responseBuilder.OK(user, "Usuário foi logado com sucesso!");
+
             }
             catch (Exception ex)
             {
-                return _responseBuilder.InternalError( $"Ocorreu um erro interno: {ex.Message}");
+                return _responseBuilder.InternalError($"Ocorreu um erro interno: {ex.Message}");
             }
         }
     }
