@@ -47,6 +47,7 @@ namespace App.Config
             services.AddScoped<ISessionRepository, SessionRepository>();
             services.AddScoped<IJobRepository, JobRepository>();
             services.AddScoped<IResponseBuilder, ResponseBuilder>();
+            services.AddScoped<IMetaInfoRepository, MetaInfoRepository>();
             services.AddScoped<UserProfileService>();
             services.AddScoped<AuthService>();
             services.AddScoped<JobService>();
