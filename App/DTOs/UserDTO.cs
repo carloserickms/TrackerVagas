@@ -5,7 +5,7 @@ namespace App.DTOs
     public class UserDTO
     {
         [Required]
-        [MaxLength(20)]
+        [MaxLength(40)]
         public string userName { get; set; }
         [Required]
         [EmailAddress]
@@ -16,6 +16,9 @@ namespace App.DTOs
         [Required]
         [MinLength(8)]
         public string rePassword { get; set; }
-    }
 
+        public string provider { get; set; }
+
+        public string providerId {get; set;}
+    }
 }
