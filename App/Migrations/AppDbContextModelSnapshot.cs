@@ -63,6 +63,32 @@ namespace App.Migrations
                     b.ToTable("JobVacancy");
                 });
 
+            modelBuilder.Entity("App.Models.MetaInfo", b =>
+                {
+                    b.Property<string>("ProviderId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("ProviderId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("MetaInfo");
+                });
+
             modelBuilder.Entity("App.Models.Session", b =>
                 {
                     b.Property<Guid>("Id")
@@ -165,6 +191,17 @@ namespace App.Migrations
                     b.Navigation("VacancyStatus");
                 });
 
+            modelBuilder.Entity("App.Models.MetaInfo", b =>
+                {
+                    b.HasOne("App.Models.User", "User")
+                        .WithOne("MetaInfo")
+                        .HasForeignKey("App.Models.MetaInfo", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("App.Models.Session", b =>
                 {
                     b.HasOne("App.Models.User", "User")
@@ -179,6 +216,9 @@ namespace App.Migrations
             modelBuilder.Entity("App.Models.User", b =>
                 {
                     b.Navigation("JobVacancy");
+
+                    b.Navigation("MetaInfo")
+                        .IsRequired();
 
                     b.Navigation("Session")
                         .IsRequired();
