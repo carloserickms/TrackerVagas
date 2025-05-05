@@ -17,8 +17,5 @@ namespace App.DTOs
         [MinLength(8)]
         public string rePassword { get; set; }
 
-        public string provider { get; set; }
-
-        public string providerId {get; set;}
     }
 }
