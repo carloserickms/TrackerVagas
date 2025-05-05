@@ -1,5 +1,6 @@
 using App.DTOs;
 using App.Helper;
+using App.Migrations;
 using App.Models;
 using App.Repositories.Interfaces;
 
@@ -26,14 +27,8 @@ namespace App.Service
         {
             try
             {
-                if (userDTO.provider == "google")
-                {
-                    string randomString = RandomGenerator.GenerateRandomString(12);
-                    userDTO.password = randomString;
-                    userDTO.rePassword = randomString;
-                }
-
                 var existingUser = await _userRepository.GetByEmail(userDTO.email);
+
                 if (existingUser != null)
                 {
                     return _responseBuilder.Conflict("O email inserido já possui cadastro.");
@@ -52,16 +47,6 @@ namespace App.Service
                 };
 
                 await _userRepository.Add(newUser);
-
-                if (userDTO.provider == "google")
-                {
-                    MetaInfo metaInfo = new(userDTO.providerId, userDTO.provider)
-                    {
-                        UserId = newUser.Id
-                    };
-
-                    await _metaInfoRepository.Add(metaInfo);
-                }
 
                 return _responseBuilder.OKNoObject("Cadastro feito com sucesso.");
             }
@@ -121,6 +106,46 @@ namespace App.Service
 
                 return _responseBuilder.OK(user, "Usuário foi logado com sucesso!");
 
+            }
+            catch (Exception ex)
+            {
+                return _responseBuilder.InternalError($"Ocorreu um erro interno: {ex.Message}");
+            }
+        }
+
+        public async Task<ResponseDTO> LoginWithGoogle(UserDTOGoogle userDTO)
+        {
+            try
+            {
+                if (userDTO.provider == "google")
+                {
+                    var existingUser = await _userRepository.GetByEmail(userDTO.email);
+
+                    if (existingUser != null)
+                    {
+                        return _responseBuilder.OK(existingUser, "Usuário inserido já possui cadastro!");
+                    }
+
+                    User newUser = new()
+                    {
+                        UserName = userDTO.userName,
+                        Email = userDTO.email,
+                        Password = userDTO.password
+                    };
+
+                    await _userRepository.Add(newUser);
+
+                    MetaInfo metaInfo = new(userDTO.providerId, userDTO.provider)
+                    {
+                        UserId = newUser.Id
+                    };
+
+                    await _metaInfoRepository.Add(metaInfo);
+
+                    return _responseBuilder.OKNoObject("Cadastro feito com sucesso.");
+                }
+
+                return _responseBuilder.Conflict("Provider não é reconhecido");
             }
             catch (Exception ex)
             {
