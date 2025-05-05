@@ -34,6 +34,21 @@ namespace App.Controllers
             }
         }
 
+        [HttpPost("create-google-account")]
+        public async Task<ActionResult> CreateGoogleAccount([FromBody] UserDTOGoogle userDTO)
+        {
+            try
+            {
+                var response = await _authService.LoginWithGoogle(userDTO);
+
+                return response.Success ? Ok(response) : BadRequest(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocorreu um erro interno: {ex.Message}");
+            }
+        }
+
         [HttpPost("login-account")]
         public async Task<ActionResult> LoginAccount([FromBody] UserSignInDTO userDTO)
         {
