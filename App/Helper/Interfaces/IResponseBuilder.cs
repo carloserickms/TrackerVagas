@@ -2,11 +2,11 @@ using App.DTOs;
 
 namespace App.Helper
 {
-    public interface IResponseBuilder<T>
+    public interface IResponseBuilder : IResponseBuilderOk
     {
-        ResponseDTO OK(object date, string message);
         ResponseDTO Conflict(string message);
         ResponseDTO NotFound(string message);
         ResponseDTO InternalError(string message);
+        ResponseDTO OKNoObject(string message);
     }   
 }

@@ -10,13 +10,15 @@ namespace App.Service
     {
         private readonly IJobRepository _jobRepository;
         private readonly IUserRepository _userRepository;
-        private readonly IResponseBuilder<JobVacancy> _responseBuilder;
+        private readonly IResponseBuilder _responseBuilder;
 
-        public JobService (IJobRepository jobRepository, IUserRepository userRepository)
+        public JobService (IJobRepository jobRepository, IUserRepository userRepository, IResponseBuilder responseBuilder)
         {
             _jobRepository = jobRepository;
             _userRepository = userRepository;
+            _responseBuilder = responseBuilder;
         }
+
 
         public async Task<ResponseDTO> Add(JobDTO JobDTO)
         {
@@ -47,12 +49,7 @@ namespace App.Service
             }
             catch (Exception ex)
             {
-                return new ResponseDTO
-                {
-                    Success = false,
-                    Message = $"Ocorreu um erro interno: {ex.Message}",
-                    Date = null
-                };
+                return _responseBuilder.InternalError( $"Ocorreu um erro interno: {ex.Message}");
             }
         }
 
@@ -69,16 +66,11 @@ namespace App.Service
 
                 await _jobRepository.Delete(job);
 
-                return _responseBuilder.OK(null, "Vaga deletada com sucesso!");
+                return _responseBuilder.OKNoObject("Vaga deletada com sucesso!");
             }
             catch (Exception ex)
             {
-                return new ResponseDTO
-                {
-                    Success = false,
-                    Message = $"Ocorreu um erro interno: {ex.Message}",
-                    Date = null
-                };
+                return _responseBuilder.InternalError( $"Ocorreu um erro interno: {ex.Message}");
             }
         }
 
@@ -97,15 +89,8 @@ namespace App.Service
             }
             catch (Exception ex)
             {
-                return new ResponseDTO
-                {
-                    Success = false,
-                    Message = $"Ocorreu um erro interno: {ex.Message}",
-                    Date = null
-                };
+                return _responseBuilder.InternalError( $"Ocorreu um erro interno: {ex.Message}");
             }
         }
-
-
     }
 }

@@ -1,8 +1,5 @@
 using App.DataBase;
-using App.DTOs;
 using App.Helper;
-using App.Helper.Builders;
-using App.Models;
 using App.Repositories;
 using App.Repositories.Interfaces;
 using App.Service;
@@ -49,9 +46,8 @@ namespace App.Config
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ISessionRepository, SessionRepository>();
             services.AddScoped<IJobRepository, JobRepository>();
-            services.AddScoped<IResponseBuilder<User>, AuthResponseBuilder>();
-            services.AddScoped<IResponseBuilder<UserLoginDTO>, LoginResponseBuilder>();
-            services.AddScoped<IResponseBuilder<JobVacancy>, JobResponseBuilder>();
+            services.AddScoped<IResponseBuilder, ResponseBuilder>();
+            services.AddScoped<IMetaInfoRepository, MetaInfoRepository>();
             services.AddScoped<UserProfileService>();
             services.AddScoped<AuthService>();
             services.AddScoped<JobService>();

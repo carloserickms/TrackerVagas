@@ -1,5 +1,6 @@
 using App.DTOs;
 using App.Helper;
+using App.Migrations;
 using App.Models;
 using App.Repositories.Interfaces;
 
@@ -9,16 +10,16 @@ namespace App.Service
     {
         private readonly IUserRepository _userRepository;
         private readonly ISessionRepository _sessionRepository;
-        private readonly IResponseBuilder<UserLoginDTO> _responseBuilderLogin;
-        private readonly IResponseBuilder<User> _responseBuilderAuth;
+        private readonly IMetaInfoRepository _metaInfoRepository;
+        private readonly IResponseBuilder _responseBuilder;
 
         public AuthService(IUserRepository userRepository, ISessionRepository sessionRepository,
-                IResponseBuilder<UserLoginDTO> responseBuilderLogin, IResponseBuilder<User> responseBuilderAuth)
+                IResponseBuilder responseBuilder, IMetaInfoRepository metaInfoRepository)
         {
             _userRepository = userRepository;
-            _responseBuilderLogin = responseBuilderLogin;
+            _responseBuilder = responseBuilder;
             _sessionRepository = sessionRepository;
-            _responseBuilderAuth = responseBuilderAuth;
+            _metaInfoRepository = metaInfoRepository;
         }
 
 
@@ -26,89 +27,129 @@ namespace App.Service
         {
             try
             {
-                var user = await _userRepository.GetByEmail(userDTO.Email);
+                var existingUser = await _userRepository.GetByEmail(userDTO.email);
 
-                if (user != null)
+                if (existingUser != null)
                 {
-                    return _responseBuilderAuth.Conflict("O email inserido já possui cadastro.");
+                    return _responseBuilder.Conflict("O email inserido já possui cadastro.");
                 }
 
-                if (userDTO.Password != userDTO.RePassword)
+                if (userDTO.password != userDTO.rePassword)
                 {
-                    return _responseBuilderAuth.Conflict("As senhas inseridas não coincidem, verifique e tente novamente.");
+                    return _responseBuilder.Conflict("As senhas inseridas não coincidem, verifique e tente novamente.");
                 }
 
                 User newUser = new()
                 {
-                    UserName = userDTO.UserName,
-                    Email = userDTO.Email,
-                    Password = userDTO.Password
+                    UserName = userDTO.userName,
+                    Email = userDTO.email,
+                    Password = userDTO.password
                 };
 
                 await _userRepository.Add(newUser);
 
-                return _responseBuilderAuth.OK(newUser, "Cadastro feito com sucesso.");
+                return _responseBuilder.OKNoObject("Cadastro feito com sucesso.");
             }
             catch (Exception ex)
             {
-                return new ResponseDTO
-                {
-                    Success = false,
-                    Message = $"Ocorreu um erro interno: {ex.Message}",
-                    Date = null
-                };
+                return _responseBuilder.InternalError($"Ocorreu um erro interno: {ex.Message}");
             }
         }
 
-        public async Task<ResponseDTO> SingIn(UserDTO userDTO)
+
+        public async Task<ResponseDTO> SingIn(UserSignInDTO userDTO)
         {
             Session session = new() { };
             UserLoginDTO userLogin = new();
 
             try
             {
-                var user = await _userRepository.GetByEmail(userDTO.Email);
+                var user = await _userRepository.GetByEmail(userDTO.email);
+
 
                 if (user == null)
                 {
-                    return _responseBuilderLogin.NotFound("Email enserido não encontrado, Verifique e tente novamente.");
+                    return _responseBuilder.NotFound("Email enserido não encontrado, Verifique e tente novamente.");
                 }
 
-                if (userDTO.Password != userDTO.RePassword)
+                if (!BCrypt.Net.BCrypt.Verify(userDTO.password, user.Password))
                 {
-                    return _responseBuilderLogin.Conflict("As senhas inseridas não coincidem, verifique e tente novamente.");
+                    return _responseBuilder.Conflict("Senha invalida");
                 }
 
                 var token = TokenService.GenerateToken(user);
 
-                session = new()
+                var hasSession = await _sessionRepository.GetById(user.Id);
+
+                if (hasSession == null)
                 {
-                    UserId = user.Id,
-                    Token = token
-                };
+                    session = new()
+                    {
+                        UserId = user.Id,
+                        Token = token
+                    };
 
-                await _sessionRepository.Add(session);
+                    await _sessionRepository.Add(session);
 
-                userLogin = new()
-                {
-                    Id = user.Id,
-                    Email = user.Email,
-                    UserName = user.UserName,
-                    Session = user.Session,
-                    CreatedAt = user.CreatedAt,
-                    UpdatedAt = user.UpdatedAt
-                };
+                    userLogin = new()
+                    {
+                        Id = user.Id,
+                        Email = user.Email,
+                        UserName = user.UserName,
+                        Session = user.Session,
+                        CreatedAt = user.CreatedAt,
+                        UpdatedAt = user.UpdatedAt
+                    };
 
-                return _responseBuilderLogin.OK(userLogin, "Usuário foi logado com sucesso!");
+                    return _responseBuilder.OK(userLogin, "Usuário foi logado com sucesso!");
+                }
+
+                return _responseBuilder.OK(user, "Usuário foi logado com sucesso!");
+
             }
             catch (Exception ex)
             {
-                return new ResponseDTO
+                return _responseBuilder.InternalError($"Ocorreu um erro interno: {ex.Message}");
+            }
+        }
+
+        public async Task<ResponseDTO> LoginWithGoogle(UserDTOGoogle userDTO)
+        {
+            try
+            {
+                if (userDTO.provider == "google")
                 {
-                    Success = false,
-                    Message = $"Ocorreu um erro interno: {ex.Message}",
-                    Date = null
-                };
+                    var existingUser = await _userRepository.GetByEmail(userDTO.email);
+
+                    if (existingUser != null)
+                    {
+                        return _responseBuilder.OK(existingUser, "Usuário inserido já possui cadastro!");
+                    }
+
+                    User newUser = new()
+                    {
+                        UserName = userDTO.userName,
+                        Email = userDTO.email,
+                        Password = userDTO.password
+                    };
+
+                    await _userRepository.Add(newUser);
+
+                    MetaInfo metaInfo = new(userDTO.providerId, userDTO.provider)
+                    {
+                        UserId = newUser.Id
+                    };
+
+                    await _metaInfoRepository.Add(metaInfo);
+
+                    return _responseBuilder.OKNoObject("Cadastro feito com sucesso.");
+                }
+
+                return _responseBuilder.Conflict("Provider não é reconhecido");
+            }
+            catch (Exception ex)
+            {
+                return _responseBuilder.InternalError($"Ocorreu um erro interno: {ex.Message}");
             }
         }
     }

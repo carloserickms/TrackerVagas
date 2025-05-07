@@ -5,12 +5,13 @@ namespace App.DataBase
 {
     public class AppDbContext : DbContext
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options){}
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        public DbSet<User> User {get; set;}
-        public DbSet<Session> Session {get; set;}
-        public DbSet<JobVacancy> JobVacancy {get; set;}
-        public DbSet<VacancyStatus> VacancyStatus {get; set;}
+        public DbSet<User> User { get; set; }
+        public DbSet<Session> Session { get; set; }
+        public DbSet<JobVacancy> JobVacancy { get; set; }
+        public DbSet<VacancyStatus> VacancyStatus { get; set; }
+        public DbSet<MetaInfo> MetaInfo { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -23,6 +24,8 @@ namespace App.DataBase
             .HasKey(j => j.Id);
             modelBuilder.Entity<VacancyStatus>()
             .HasKey(v => v.Id);
+            modelBuilder.Entity<MetaInfo>()
+            .HasKey(mi => mi.ProviderId);
 
             modelBuilder.Entity<User>()
             .HasIndex(u => u.UserName).IsUnique();
@@ -43,7 +46,11 @@ namespace App.DataBase
             .HasMany(u => u.JobVacancy)
             .WithOne(j => j.User)
             .HasForeignKey(u => u.UserId);
-            
+
+            modelBuilder.Entity<MetaInfo>()
+            .HasOne(mi => mi.User)
+            .WithOne(u => u.MetaInfo)
+            .HasForeignKey<MetaInfo>(u => u.UserId);
         }
     }
 }

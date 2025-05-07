@@ -1,14 +1,11 @@
-
 using App.DTOs;
-using App.Models;
 
-namespace App.Helper.Builders
+namespace App.Helper
 {
-    public class AuthResponseBuilder : ResponseBase<User>, IResponseBuilder<User>
+    public class ResponseBuilder : ResponseBase
     {
         public override ResponseDTO Conflict(string message)
         {
-
             ResponseDTO response = new()
             {
                 Message = message,
@@ -40,13 +37,24 @@ namespace App.Helper.Builders
             return response;
         }
 
-        public override ResponseDTO OK(object date, string message)
+        public override ResponseDTO OK<T>(T data, string message)
         {
             ResponseDTO response = new()
             {
                 Message = message,
                 Success = true,
-                Date = date
+                Data = data
+            };
+
+            return response;
+        }
+
+        public override ResponseDTO OKNoObject(string message)
+        {
+            ResponseDTO response = new()
+            {
+                Message = message,
+                Success = true,
             };
 
             return response;
