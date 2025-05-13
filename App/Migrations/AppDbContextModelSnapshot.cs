@@ -36,9 +36,8 @@ namespace App.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Modality")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<Guid>("ModalityId")
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -87,6 +86,27 @@ namespace App.Migrations
                         .IsUnique();
 
                     b.ToTable("MetaInfo");
+                });
+
+            modelBuilder.Entity("App.Models.Modality", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Modality");
                 });
 
             modelBuilder.Entity("App.Models.Session", b =>
@@ -180,11 +200,19 @@ namespace App.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("App.Models.Modality", "Modality")
+                        .WithOne("JobVacancy")
+                        .HasForeignKey("App.Models.JobVacancy", "VacancyStatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("App.Models.VacancyStatus", "VacancyStatus")
                         .WithOne("JobVacancy")
                         .HasForeignKey("App.Models.JobVacancy", "VacancyStatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Modality");
 
                     b.Navigation("User");
 
@@ -211,6 +239,12 @@ namespace App.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("App.Models.Modality", b =>
+                {
+                    b.Navigation("JobVacancy")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("App.Models.User", b =>
