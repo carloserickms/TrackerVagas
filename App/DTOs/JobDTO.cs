@@ -13,7 +13,7 @@ namespace App.DTOs
         [Required]
         public Guid Status {get; set;}
         [Required]
-        public string Modality {get; set;}
+        public Guid Modality {get; set;}
         [Required]
         public Guid UserId {get; set;}
     }
