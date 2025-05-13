@@ -12,6 +12,7 @@ namespace App.DataBase
         public DbSet<JobVacancy> JobVacancy { get; set; }
         public DbSet<VacancyStatus> VacancyStatus { get; set; }
         public DbSet<MetaInfo> MetaInfo { get; set; }
+        public DbSet<Modality> Modality {get; set;}
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -24,6 +25,8 @@ namespace App.DataBase
             .HasKey(j => j.Id);
             modelBuilder.Entity<VacancyStatus>()
             .HasKey(v => v.Id);
+            modelBuilder.Entity<Modality>()
+            .HasKey(m => m.Id);
             modelBuilder.Entity<MetaInfo>()
             .HasKey(mi => mi.ProviderId);
 
@@ -40,6 +43,11 @@ namespace App.DataBase
             modelBuilder.Entity<JobVacancy>()
             .HasOne(j => j.VacancyStatus)
             .WithOne(v => v.JobVacancy)
+            .HasForeignKey<JobVacancy>(j => j.VacancyStatusId);
+
+            modelBuilder.Entity<JobVacancy>()
+            .HasOne(j => j.Modality)
+            .WithOne(m => m.JobVacancy)
             .HasForeignKey<JobVacancy>(j => j.VacancyStatusId);
 
             modelBuilder.Entity<User>()
