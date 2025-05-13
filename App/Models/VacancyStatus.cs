@@ -1,13 +1,16 @@
 
+using System.Text.Json.Serialization;
+
 namespace App.Models
 {
     public class VacancyStatus : ModelBase
     {
         public string Name {get; set;}
+        [JsonIgnore]
         public JobVacancy JobVacancy {get; set;}
 
         
-        public VacancyStatus(Guid id, DateTime createdAt, DateTime updatedAt) : base(id, createdAt, updatedAt){}
+        public VacancyStatus() : base(Guid.NewGuid(), DateTime.Now, DateTime.Now){}
         public VacancyStatus(string name, Guid id, DateTime createdAt, DateTime updatedAt) : base(id, createdAt, updatedAt)
         {
             Name = name;
