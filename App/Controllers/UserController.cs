@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace App.Controllers
 {
     [ApiController]
-    [Route("Api/v1")]
+    [Route("api/v1")]
     public class UserController : Controller
     {
         private readonly UserProfileService _userProfileService;
@@ -54,6 +54,8 @@ namespace App.Controllers
         {
             try
             {
+                Console.WriteLine(userDTO);
+
                 var response = await _authService.SingIn(userDTO);
 
                 return response.Success ? Ok(response) : BadRequest(response);
