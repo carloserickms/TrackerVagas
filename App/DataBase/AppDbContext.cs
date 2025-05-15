@@ -42,13 +42,13 @@ namespace App.DataBase
 
             modelBuilder.Entity<JobVacancy>()
             .HasOne(j => j.VacancyStatus)
-            .WithOne(v => v.JobVacancy)
-            .HasForeignKey<JobVacancy>(j => j.VacancyStatusId);
+            .WithMany(v => v.JobVacancy)
+            .HasForeignKey(j => j.VacancyStatusId);
 
             modelBuilder.Entity<JobVacancy>()
             .HasOne(j => j.Modality)
-            .WithOne(m => m.JobVacancy)
-            .HasForeignKey<JobVacancy>(j => j.VacancyStatusId);
+            .WithMany(m => m.JobVacancy)
+            .HasForeignKey(j => j.ModalityId);
 
             modelBuilder.Entity<User>()
             .HasMany(u => u.JobVacancy)
