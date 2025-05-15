@@ -39,6 +39,16 @@ namespace App.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task<Modality> GetModalityById(Guid modalityId)
+        {
+            return await _context.Modality.FirstAsync(m => m.Id == modalityId);
+        }
+
+        public async Task<VacancyStatus> GetStatusById(Guid statusId)
+        {
+            return await _context.VacancyStatus.FirstAsync(s => s.Id == statusId);
+        }
+
         public async override Task Delete(JobVacancy job)
         {
             throw new NotImplementedException();
