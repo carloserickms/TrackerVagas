@@ -8,7 +8,7 @@ namespace App.Models
 
         public string Name {get; set;}
         [JsonIgnore]
-        public JobVacancy JobVacancy {get; set;}
+        public ICollection<JobVacancy> JobVacancy {get; set;}
 
 
         public Modality() : base(Guid.NewGuid(), DateTime.Now, DateTime.Now) { }
