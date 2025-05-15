@@ -54,10 +54,11 @@ namespace App.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ModalityId");
+
                     b.HasIndex("UserId");
 
-                    b.HasIndex("VacancyStatusId")
-                        .IsUnique();
+                    b.HasIndex("VacancyStatusId");
 
                     b.ToTable("JobVacancy");
                 });
@@ -194,21 +195,21 @@ namespace App.Migrations
 
             modelBuilder.Entity("App.Models.JobVacancy", b =>
                 {
+                    b.HasOne("App.Models.Modality", "Modality")
+                        .WithMany("JobVacancy")
+                        .HasForeignKey("ModalityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("App.Models.User", "User")
                         .WithMany("JobVacancy")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("App.Models.Modality", "Modality")
-                        .WithOne("JobVacancy")
-                        .HasForeignKey("App.Models.JobVacancy", "VacancyStatusId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("App.Models.VacancyStatus", "VacancyStatus")
-                        .WithOne("JobVacancy")
-                        .HasForeignKey("App.Models.JobVacancy", "VacancyStatusId")
+                        .WithMany("JobVacancy")
+                        .HasForeignKey("VacancyStatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -243,8 +244,7 @@ namespace App.Migrations
 
             modelBuilder.Entity("App.Models.Modality", b =>
                 {
-                    b.Navigation("JobVacancy")
-                        .IsRequired();
+                    b.Navigation("JobVacancy");
                 });
 
             modelBuilder.Entity("App.Models.User", b =>
@@ -260,8 +260,7 @@ namespace App.Migrations
 
             modelBuilder.Entity("App.Models.VacancyStatus", b =>
                 {
-                    b.Navigation("JobVacancy")
-                        .IsRequired();
+                    b.Navigation("JobVacancy");
                 });
 #pragma warning restore 612, 618
         }
