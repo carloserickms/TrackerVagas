@@ -11,5 +11,7 @@ namespace App.Repositories.Interfaces
         Task AddVacacyStatus(VacancyStatus status);
         Task<IEnumerable<Modality>> AllModality();
         Task AddModality(Modality modality);
+        Task<Modality> GetModalityById(Guid id);
+        Task<VacancyStatus> GetStatusById(Guid id);
     }
 }
