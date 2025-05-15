@@ -24,16 +24,16 @@ namespace App.Controllers
         {
             try
             {
-                var tokenUserID = User.FindFirst("userId")?.Value;
+                var tokenUserID = User.FindFirst("UserId")?.Value;
 
                 if (tokenUserID == null)
                 {
-                    return BadRequest("Usuario sem autorização");
+                    return BadRequest($"Usuario sem autorização {tokenUserID}");
                 }
 
                 var userId = Guid.Parse(tokenUserID);
 
-                jobDTO.UserId = userId;
+                jobDTO.userId = userId;
                 var response = await _jobService.Add(jobDTO);
 
                 return response.Success ? Ok(response) : BadRequest(response);
@@ -74,7 +74,7 @@ namespace App.Controllers
         {
             try
             {
-                var tokenUserID = User.FindFirst("userId")?.Value;
+                var tokenUserID = User.FindFirst("UserId")?.Value;
 
                 if (tokenUserID == null)
                 {
