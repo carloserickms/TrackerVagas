@@ -24,24 +24,25 @@ namespace App.Service
         {
             try
             {
-                ResponseDTO response = new();   
+                ResponseDTO response = new();
+
+                var user = await _userRepository.GetById(JobDTO.userId);
+                var modality = await _jobRepository.GetModalityById(JobDTO.modality);
+                var status = await _jobRepository.GetStatusById(JobDTO.status);
+
+                Console.WriteLine(modality);
+                Console.WriteLine(status);
+                Console.WriteLine(user);
                 
-                var user = _userRepository.GetById(JobDTO.UserId);
-
-                if (user== null)
-                {
-                    return _responseBuilder.NotFound("Usuario não encontrado!");
-                }
-
-
 
                 JobVacancy job = new()
                 {
-                    Title = JobDTO.Title,
-                    EnterpriseName = JobDTO.EnterpriseName,
-                    Link = JobDTO.Link,
-                    VacancyStatusId = JobDTO.Status,
-                    UserId = JobDTO.UserId
+                    Title = JobDTO.title,
+                    EnterpriseName = JobDTO.enterpriseName,
+                    Link = JobDTO.link,
+                    UserId = user.Id,
+                    ModalityId = modality.Id,
+                    VacancyStatusId = status.Id
                 };
 
                 await _jobRepository.Add(job);
