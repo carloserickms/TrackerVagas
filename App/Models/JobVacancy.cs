@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace App.Models
 {
     public class JobVacancy : ModelBase
@@ -9,8 +11,11 @@ namespace App.Models
         public Guid ModalityId {get; set;}
         public Guid UserId {get; set;}
 
+        [JsonIgnore]
         public Modality Modality {get; set;}
+        [JsonIgnore]
         public VacancyStatus VacancyStatus {get; set;}
+        [JsonIgnore]
         public User User {get; set;}
 
         public JobVacancy() : base(Guid.NewGuid(), DateTime.Now, DateTime.Now) { }
