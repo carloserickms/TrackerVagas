@@ -17,6 +17,38 @@ namespace App.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task<IEnumerable<VacancyStatus>> AllStatus()
+        {
+            return await _context.VacancyStatus.ToListAsync();
+        }
+
+        public async Task AddVacacyStatus(VacancyStatus status)
+        {
+            _context.VacancyStatus.Add(status);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<Modality>> AllModality()
+        {
+            return await _context.Modality.ToListAsync();
+        }
+
+        public async Task AddModality(Modality modality)
+        {
+            _context.Modality.Add(modality);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<Modality> GetModalityById(Guid modalityId)
+        {
+            return await _context.Modality.FirstAsync(m => m.Id == modalityId);
+        }
+
+        public async Task<VacancyStatus> GetStatusById(Guid statusId)
+        {
+            return await _context.VacancyStatus.FirstAsync(s => s.Id == statusId);
+        }
+
         public async override Task Delete(JobVacancy job)
         {
             throw new NotImplementedException();

@@ -6,12 +6,28 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace App.Migrations
 {
     /// <inheritdoc />
-    public partial class initialMigration : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Modality",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Modality", x => x.Id);
+                })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
@@ -51,6 +67,30 @@ namespace App.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "MetaInfo",
+                columns: table => new
+                {
+                    ProviderId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Provider = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MetaInfo", x => x.ProviderId);
+                    table.ForeignKey(
+                        name: "FK_MetaInfo_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "Session",
                 columns: table => new
                 {
@@ -84,9 +124,8 @@ namespace App.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     EnterpriseName = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Modality = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
                     VacancyStatusId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    ModalityId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
@@ -94,6 +133,12 @@ namespace App.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_JobVacancy", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_JobVacancy_Modality_ModalityId",
+                        column: x => x.ModalityId,
+                        principalTable: "Modality",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_JobVacancy_User_UserId",
                         column: x => x.UserId,
@@ -110,6 +155,11 @@ namespace App.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
+                name: "IX_JobVacancy_ModalityId",
+                table: "JobVacancy",
+                column: "ModalityId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_JobVacancy_UserId",
                 table: "JobVacancy",
                 column: "UserId");
@@ -117,7 +167,12 @@ namespace App.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_JobVacancy_VacancyStatusId",
                 table: "JobVacancy",
-                column: "VacancyStatusId",
+                column: "VacancyStatusId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MetaInfo_UserId",
+                table: "MetaInfo",
+                column: "UserId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -146,7 +201,13 @@ namespace App.Migrations
                 name: "JobVacancy");
 
             migrationBuilder.DropTable(
+                name: "MetaInfo");
+
+            migrationBuilder.DropTable(
                 name: "Session");
+
+            migrationBuilder.DropTable(
+                name: "Modality");
 
             migrationBuilder.DropTable(
                 name: "VacancyStatus");

@@ -5,16 +5,15 @@ namespace App.DTOs
     public class JobDTO
     {
         [Required]
-        public string Title {get; set;}
+        public string title {get; set;}
         [Required]
-        public string Link {get; set;}
+        public string link {get; set;}
         [Required]
-        public string EnterpriseName {get; set;}
+        public string enterpriseName {get; set;}
         [Required]
-        public Guid Status {get; set;}
+        public Guid status {get; set;}
         [Required]
-        public string Modality {get; set;}
-        [Required]
-        public Guid UserId {get; set;}
+        public Guid modality {get; set;}
+        public Guid userId {get; set;}
     }
 }

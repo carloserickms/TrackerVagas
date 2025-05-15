@@ -1,6 +1,5 @@
 using App.DTOs;
 using App.Helper;
-using App.Migrations;
 using App.Models;
 using App.Repositories.Interfaces;
 
@@ -66,6 +65,7 @@ namespace App.Service
             {
                 var user = await _userRepository.GetByEmail(userDTO.email);
 
+                Console.WriteLine($">>>>>>> {user}");
 
                 if (user == null)
                 {

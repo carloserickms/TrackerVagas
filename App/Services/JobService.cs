@@ -24,23 +24,25 @@ namespace App.Service
         {
             try
             {
-                ResponseDTO response = new();   
-                
-                var user = _userRepository.GetById(JobDTO.UserId);
+                ResponseDTO response = new();
 
-                if (user== null)
-                {
-                    return _responseBuilder.NotFound("Usuario não encontrado!");
-                }
+                var user = await _userRepository.GetById(JobDTO.userId);
+                var modality = await _jobRepository.GetModalityById(JobDTO.modality);
+                var status = await _jobRepository.GetStatusById(JobDTO.status);
+
+                Console.WriteLine(modality);
+                Console.WriteLine(status);
+                Console.WriteLine(user);
+                
 
                 JobVacancy job = new()
                 {
-                    Title = JobDTO.Title,
-                    EnterpriseName = JobDTO.EnterpriseName,
-                    Link = JobDTO.Link,
-                    Modality = JobDTO.Modality,
-                    VacancyStatusId = JobDTO.Status,
-                    UserId = JobDTO.UserId
+                    Title = JobDTO.title,
+                    EnterpriseName = JobDTO.enterpriseName,
+                    Link = JobDTO.link,
+                    UserId = user.Id,
+                    ModalityId = modality.Id,
+                    VacancyStatusId = status.Id
                 };
 
                 await _jobRepository.Add(job);
@@ -86,6 +88,86 @@ namespace App.Service
                 }
 
                 return _responseBuilder.OK(jobs, "Todos as vagas foram encontradas");
+            }
+            catch (Exception ex)
+            {
+                return _responseBuilder.InternalError( $"Ocorreu um erro interno: {ex.Message}");
+            }
+        }
+
+        public async Task<ResponseDTO> CreateStatus(TypesDTO typesDTO)
+        {
+            try
+            {
+                var statusList = _jobRepository.AllStatus();
+
+                VacancyStatus status = new()
+                {
+                    Name = typesDTO.name
+                };
+
+                await _jobRepository.AddVacacyStatus(status);
+
+                return _responseBuilder.OK(status, "Modalidade criada com sucesso!");
+            }
+            catch (Exception ex)
+            {
+                return _responseBuilder.InternalError( $"Ocorreu um erro interno: {ex.Message}");
+            }
+        }
+
+        public async Task<ResponseDTO> GetAllStatus()
+        {
+            try
+            {
+                var status = await _jobRepository.AllStatus();
+
+                if (status == null)
+                {
+                    return _responseBuilder.NotFound("Nenhum dado foi encontrado!");
+                }
+
+                return _responseBuilder.OK(status, "Dados encontrados com sucesso!");
+            }
+            catch (Exception ex)
+            {
+                return _responseBuilder.InternalError( $"Ocorreu um erro interno: {ex.Message}");
+            }
+        }
+
+        public async Task<ResponseDTO> CreateModality(TypesDTO typesDTO)
+        {
+            try
+            {
+                var modalityList = await _jobRepository.AllModality();
+
+                Modality modality = new()
+                {
+                    Name = typesDTO.name
+                };
+
+                await _jobRepository.AddModality(modality);
+
+                return _responseBuilder.OK(modality, "Modalidade criada com sucesso!");
+            }
+            catch (Exception ex)
+            {
+                return _responseBuilder.InternalError( $"Ocorreu um erro interno: {ex.Message}");
+            }
+        }
+
+        public async Task<ResponseDTO> GetAllModality()
+        {
+            try
+            {
+                var modalityList = await _jobRepository.AllModality();
+
+                if (modalityList == null)
+                {
+                    return _responseBuilder.NotFound("Nenhum dado foi encontrado!");
+                }
+
+                return _responseBuilder.OK(modalityList, "Dados encontrados com sucesso!");
             }
             catch (Exception ex)
             {

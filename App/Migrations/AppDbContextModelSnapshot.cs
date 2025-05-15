@@ -36,9 +36,8 @@ namespace App.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Modality")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<Guid>("ModalityId")
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -55,10 +54,11 @@ namespace App.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ModalityId");
+
                     b.HasIndex("UserId");
 
-                    b.HasIndex("VacancyStatusId")
-                        .IsUnique();
+                    b.HasIndex("VacancyStatusId");
 
                     b.ToTable("JobVacancy");
                 });
@@ -87,6 +87,27 @@ namespace App.Migrations
                         .IsUnique();
 
                     b.ToTable("MetaInfo");
+                });
+
+            modelBuilder.Entity("App.Models.Modality", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Modality");
                 });
 
             modelBuilder.Entity("App.Models.Session", b =>
@@ -174,6 +195,12 @@ namespace App.Migrations
 
             modelBuilder.Entity("App.Models.JobVacancy", b =>
                 {
+                    b.HasOne("App.Models.Modality", "Modality")
+                        .WithMany("JobVacancy")
+                        .HasForeignKey("ModalityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("App.Models.User", "User")
                         .WithMany("JobVacancy")
                         .HasForeignKey("UserId")
@@ -181,10 +208,12 @@ namespace App.Migrations
                         .IsRequired();
 
                     b.HasOne("App.Models.VacancyStatus", "VacancyStatus")
-                        .WithOne("JobVacancy")
-                        .HasForeignKey("App.Models.JobVacancy", "VacancyStatusId")
+                        .WithMany("JobVacancy")
+                        .HasForeignKey("VacancyStatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Modality");
 
                     b.Navigation("User");
 
@@ -213,6 +242,11 @@ namespace App.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("App.Models.Modality", b =>
+                {
+                    b.Navigation("JobVacancy");
+                });
+
             modelBuilder.Entity("App.Models.User", b =>
                 {
                     b.Navigation("JobVacancy");
@@ -226,8 +260,7 @@ namespace App.Migrations
 
             modelBuilder.Entity("App.Models.VacancyStatus", b =>
                 {
-                    b.Navigation("JobVacancy")
-                        .IsRequired();
+                    b.Navigation("JobVacancy");
                 });
 #pragma warning restore 612, 618
         }

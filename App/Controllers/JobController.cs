@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace App.Controllers
 {
+    [ApiController]
+    [Route("api/v1")]
     public class JobController : Controller
     {
         private readonly JobService _jobService;
@@ -22,16 +24,16 @@ namespace App.Controllers
         {
             try
             {
-                var tokenUserID = User.FindFirst("userId")?.Value;
+                var tokenUserID = User.FindFirst("UserId")?.Value;
 
                 if (tokenUserID == null)
                 {
-                    return BadRequest("Usuario sem autorização");
+                    return BadRequest($"Usuario sem autorização {tokenUserID}");
                 }
 
                 var userId = Guid.Parse(tokenUserID);
 
-                jobDTO.UserId = userId;
+                jobDTO.userId = userId;
                 var response = await _jobService.Add(jobDTO);
 
                 return response.Success ? Ok(response) : BadRequest(response);
@@ -66,13 +68,13 @@ namespace App.Controllers
             }
         }
 
-        [HttpGet("GetAll-jobs")]
+        [HttpGet("get-all-jobs")]
         [Authorize]
         public async Task<ActionResult> GetAllById([FromBody] SearchByIdDTO searchByIdDTO)
         {
             try
             {
-                var tokenUserID = User.FindFirst("userId")?.Value;
+                var tokenUserID = User.FindFirst("UserId")?.Value;
 
                 if (tokenUserID == null)
                 {
@@ -81,6 +83,70 @@ namespace App.Controllers
 
                 var userId = Guid.Parse(tokenUserID);
                 var response = await _jobService.GetAllById(searchByIdDTO);
+
+                return response.Success ? Ok(response) : BadRequest(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocorreu um erro interno: {ex.Message}");
+            }
+        }
+
+        [HttpGet("get-all-status")]
+        [Authorize]
+        public async Task<ActionResult> GetAllStatus()
+        {
+            try
+            {
+                var response = await _jobService.GetAllStatus();
+
+                return response.Success ? Ok(response) : BadRequest(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocorreu um erro interno: {ex.Message}");
+            }
+        }
+
+        [HttpPost("create-status")]
+        [Authorize]
+        public async Task<ActionResult> CreateStatus([FromBody] TypesDTO typesDTO)
+        {
+            try
+            {
+                var response = await _jobService.CreateStatus(typesDTO);
+
+                return response.Success ? Ok(response) : BadRequest(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocorreu um erro interno: {ex.Message}");
+            }
+        }
+
+        [HttpGet("get-all-modality")]
+        [Authorize]
+        public async Task<ActionResult> GetAllModality()
+        {
+            try
+            {
+                var response = await _jobService.GetAllModality();
+
+                return response.Success ? Ok(response) : BadRequest(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocorreu um erro interno: {ex.Message}");
+            }
+        }
+
+        [HttpPost("create-modality")]
+        [Authorize]
+        public async Task<ActionResult> CreateModality([FromBody] TypesDTO typesDTO)
+        {
+            try
+            {
+                var response = await _jobService.CreateModality(typesDTO);
 
                 return response.Success ? Ok(response) : BadRequest(response);
             }

@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace App.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250420020435_initialMigration")]
-    partial class initialMigration
+    [Migration("20250515041823_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,9 +39,8 @@ namespace App.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Modality")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<Guid>("ModalityId")
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -58,12 +57,60 @@ namespace App.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ModalityId");
+
                     b.HasIndex("UserId");
 
-                    b.HasIndex("VacancyStatusId")
-                        .IsUnique();
+                    b.HasIndex("VacancyStatusId");
 
                     b.ToTable("JobVacancy");
+                });
+
+            modelBuilder.Entity("App.Models.MetaInfo", b =>
+                {
+                    b.Property<string>("ProviderId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("ProviderId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("MetaInfo");
+                });
+
+            modelBuilder.Entity("App.Models.Modality", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Modality");
                 });
 
             modelBuilder.Entity("App.Models.Session", b =>
@@ -151,6 +198,12 @@ namespace App.Migrations
 
             modelBuilder.Entity("App.Models.JobVacancy", b =>
                 {
+                    b.HasOne("App.Models.Modality", "Modality")
+                        .WithMany("JobVacancy")
+                        .HasForeignKey("ModalityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("App.Models.User", "User")
                         .WithMany("JobVacancy")
                         .HasForeignKey("UserId")
@@ -158,14 +211,27 @@ namespace App.Migrations
                         .IsRequired();
 
                     b.HasOne("App.Models.VacancyStatus", "VacancyStatus")
-                        .WithOne("JobVacancy")
-                        .HasForeignKey("App.Models.JobVacancy", "VacancyStatusId")
+                        .WithMany("JobVacancy")
+                        .HasForeignKey("VacancyStatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Modality");
 
                     b.Navigation("User");
 
                     b.Navigation("VacancyStatus");
+                });
+
+            modelBuilder.Entity("App.Models.MetaInfo", b =>
+                {
+                    b.HasOne("App.Models.User", "User")
+                        .WithOne("MetaInfo")
+                        .HasForeignKey("App.Models.MetaInfo", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("App.Models.Session", b =>
@@ -179,9 +245,17 @@ namespace App.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("App.Models.Modality", b =>
+                {
+                    b.Navigation("JobVacancy");
+                });
+
             modelBuilder.Entity("App.Models.User", b =>
                 {
                     b.Navigation("JobVacancy");
+
+                    b.Navigation("MetaInfo")
+                        .IsRequired();
 
                     b.Navigation("Session")
                         .IsRequired();
@@ -189,8 +263,7 @@ namespace App.Migrations
 
             modelBuilder.Entity("App.Models.VacancyStatus", b =>
                 {
-                    b.Navigation("JobVacancy")
-                        .IsRequired();
+                    b.Navigation("JobVacancy");
                 });
 #pragma warning restore 612, 618
         }
