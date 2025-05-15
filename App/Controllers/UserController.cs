@@ -98,13 +98,38 @@ namespace App.Controllers
             {
                 var tokenUserID = User.FindFirst("UserId")?.Value;
 
-                if(tokenUserID == null)
+                if (tokenUserID == null)
                 {
                     return BadRequest("Usuario sem autorização");
                 }
 
                 var userId = Guid.Parse(tokenUserID);
-                var response = await _userProfileService.ChangeUserInformation(userId ,chengeAccountDTO);
+                var response = await _userProfileService.ChangeUserInformation(userId, chengeAccountDTO);
+
+                return response.Success ? Ok(response) : BadRequest(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocorreu um erro interno: {ex.Message}");
+            }
+        }
+
+        [HttpGet("user-by-id")]
+        [Authorize]
+        public async Task<ActionResult> UserById()
+        {
+            try
+            {
+                var tokenUserID = User.FindFirst("UserId")?.Value;
+
+                if (tokenUserID == null)
+                {
+                    return BadRequest("Usuario sem autorização");
+                }
+
+                var userId = Guid.Parse(tokenUserID);
+
+                var response = await _userProfileService.UserById(userId);
 
                 return response.Success ? Ok(response) : BadRequest(response);
             }
