@@ -78,5 +78,25 @@ namespace App.Service
                 return _responseBuilder.InternalError( $"Ocorreu um erro interno: {ex.Message}");
             }
         }
+
+        public async Task<ResponseDTO> UserById(Guid id)
+        {
+            try
+            {
+                var user = await _userRepository.GetById(id);
+
+                if (user == null)
+                {
+                    return _responseBuilder.NotFound("Usuario não encontrado, Verifique e tente novamente.");
+                }
+
+                return _responseBuilder.OK(user, "Informações encontradas com sucesso!");
+
+            }
+            catch (Exception ex)
+            {
+                return _responseBuilder.InternalError( $"Ocorreu um erro interno: {ex.Message}");
+            }
+        }
     }
 }
