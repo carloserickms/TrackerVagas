@@ -46,7 +46,7 @@ namespace App.Repositories
 
         public async Task<VacancyStatus> GetStatusById(Guid statusId)
         {
-            return await _context.VacancyStatus.FirstAsync(s => s.Id == statusId);
+            return await _context.VacancyStatus.FirstOrDefaultAsync(s => s.Id == statusId);
         }
 
         public async override Task Delete(JobVacancy job)
