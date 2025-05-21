@@ -33,7 +33,7 @@ namespace App.Service
                 Console.WriteLine(modality);
                 Console.WriteLine(status);
                 Console.WriteLine(user);
-                
+
 
                 JobVacancy job = new()
                 {
@@ -51,7 +51,7 @@ namespace App.Service
             }
             catch (Exception ex)
             {
-                return _responseBuilder.InternalError( $"Ocorreu um erro interno: {ex.Message}");
+                return _responseBuilder.InternalError($"Ocorreu um erro interno: {ex.Message}");
             }
         }
 
@@ -61,7 +61,7 @@ namespace App.Service
             {
                 var job = await _jobRepository.GetById(searchByIdDTO.Id);
 
-                if(job == null)
+                if (job == null)
                 {
                     return _responseBuilder.Conflict("Vaga não encontrada!");
                 }
@@ -72,7 +72,7 @@ namespace App.Service
             }
             catch (Exception ex)
             {
-                return _responseBuilder.InternalError( $"Ocorreu um erro interno: {ex.Message}");
+                return _responseBuilder.InternalError($"Ocorreu um erro interno: {ex.Message}");
             }
         }
 
@@ -80,18 +80,37 @@ namespace App.Service
         {
             try
             {
+                List<JobResponseDTO> jobslist = new List<JobResponseDTO>();
+
                 var jobs = await _jobRepository.GetAllById(searchByIdDTO.Id);
 
-                if(jobs == null)
+                if (jobs == null)
                 {
                     return _responseBuilder.NotFound("Nenhuma vaga foi encontrada!");
                 }
 
-                return _responseBuilder.OK(jobs, "Todos as vagas foram encontradas");
+                foreach (var item in jobs)
+                {
+                    var status = await _jobRepository.GetStatusById(item.VacancyStatusId);
+                    var modality = await _jobRepository.GetModalityById(item.ModalityId);
+
+                    jobslist.Add(new JobResponseDTO
+                    {
+                        title = item.Title,
+                        link = item.Link,
+                        enterpriseName = item.EnterpriseName,
+                        status = status.Name,
+                        modality = modality.Name,
+                        createdAt = item.CreatedAt,
+                        updatedAt = item.UpdatedAt
+                    });
+                }
+
+                return _responseBuilder.OK(jobslist, "Todos as vagas foram encontradas");
             }
             catch (Exception ex)
             {
-                return _responseBuilder.InternalError( $"Ocorreu um erro interno: {ex.Message}");
+                return _responseBuilder.InternalError($"Ocorreu um erro interno: {ex.Message}");
             }
         }
 
@@ -112,7 +131,7 @@ namespace App.Service
             }
             catch (Exception ex)
             {
-                return _responseBuilder.InternalError( $"Ocorreu um erro interno: {ex.Message}");
+                return _responseBuilder.InternalError($"Ocorreu um erro interno: {ex.Message}");
             }
         }
 
@@ -131,7 +150,7 @@ namespace App.Service
             }
             catch (Exception ex)
             {
-                return _responseBuilder.InternalError( $"Ocorreu um erro interno: {ex.Message}");
+                return _responseBuilder.InternalError($"Ocorreu um erro interno: {ex.Message}");
             }
         }
 
@@ -152,7 +171,7 @@ namespace App.Service
             }
             catch (Exception ex)
             {
-                return _responseBuilder.InternalError( $"Ocorreu um erro interno: {ex.Message}");
+                return _responseBuilder.InternalError($"Ocorreu um erro interno: {ex.Message}");
             }
         }
 
@@ -171,7 +190,7 @@ namespace App.Service
             }
             catch (Exception ex)
             {
-                return _responseBuilder.InternalError( $"Ocorreu um erro interno: {ex.Message}");
+                return _responseBuilder.InternalError($"Ocorreu um erro interno: {ex.Message}");
             }
         }
     }
