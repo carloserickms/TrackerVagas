@@ -70,10 +70,12 @@ namespace App.Controllers
 
         [HttpGet("get-all-jobs")]
         [Authorize]
-        public async Task<ActionResult> GetAllById([FromBody] SearchByIdDTO searchByIdDTO)
+        public async Task<ActionResult> GetAllById()
         {
             try
             {
+                SearchByIdDTO searchByIdDTO = new SearchByIdDTO();
+
                 var tokenUserID = User.FindFirst("UserId")?.Value;
 
                 if (tokenUserID == null)
@@ -82,6 +84,7 @@ namespace App.Controllers
                 }
 
                 var userId = Guid.Parse(tokenUserID);
+                searchByIdDTO.Id = userId;
                 var response = await _jobService.GetAllById(searchByIdDTO);
 
                 return response.Success ? Ok(response) : BadRequest(response);
