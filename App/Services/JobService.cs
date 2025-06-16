@@ -12,7 +12,7 @@ namespace App.Service
         private readonly IUserRepository _userRepository;
         private readonly IResponseBuilder _responseBuilder;
 
-        public JobService (IJobRepository jobRepository, IUserRepository userRepository, IResponseBuilder responseBuilder)
+        public JobService(IJobRepository jobRepository, IUserRepository userRepository, IResponseBuilder responseBuilder)
         {
             _jobRepository = jobRepository;
             _userRepository = userRepository;
@@ -118,7 +118,7 @@ namespace App.Service
         {
             try
             {
-                var statusList = _jobRepository.AllStatus();
+                var statusList = await _jobRepository.AllStatus();
 
                 VacancyStatus status = new()
                 {
@@ -139,6 +139,8 @@ namespace App.Service
         {
             try
             {
+                List<AllStatusResponseDTO> allStatus = new List<AllStatusResponseDTO>();
+
                 var status = await _jobRepository.AllStatus();
 
                 if (status == null)
@@ -146,7 +148,16 @@ namespace App.Service
                     return _responseBuilder.NotFound("Nenhum dado foi encontrado!");
                 }
 
-                return _responseBuilder.OK(status, "Dados encontrados com sucesso!");
+                foreach (var item in status)
+                {
+                    allStatus.Add(new AllStatusResponseDTO
+                    {
+                        id =  item.Id,
+                        name = item.Name
+                    });
+                }
+
+                return _responseBuilder.OK(allStatus, "Dados encontrados com sucesso!");
             }
             catch (Exception ex)
             {
