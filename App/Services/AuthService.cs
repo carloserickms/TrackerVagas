@@ -205,5 +205,26 @@ namespace App.Service
                 return _responseBuilder.InternalError($"Ocorreu um erro interno: {ex.Message}");
             }
         }
+
+        public async Task<ResponseDTO> LogOutAccount(Guid userId)
+        {
+            try
+            {
+                var session = await _sessionRepository.GetById(userId);
+
+                if (session == null)
+                {
+                    return _responseBuilder.Conflict("Sessão não existe!");
+                }
+
+                await _sessionRepository.Delete(session);
+
+                return _responseBuilder.OKNoObject("Usuário deslogado do sistema com sucesso!");
+            }
+            catch (Exception ex)
+            {
+                return _responseBuilder.InternalError($"Ocorreu um erro interno: {ex.Message}");
+            }
+        }
     }
 }
