@@ -138,5 +138,30 @@ namespace App.Controllers
                 return StatusCode(500, $"Ocorreu um erro interno: {ex.Message}");
             }
         }
+
+        [HttpPost("logout")]
+        [Authorize]
+        public async Task<ActionResult> Logout()
+        {
+            try
+            {
+                var tokenUserID = User.FindFirst("UserId")?.Value;
+
+                if (tokenUserID == null)
+                {
+                    return BadRequest("Usuario sem autorização");
+                }
+
+                var userId = Guid.Parse(tokenUserID);
+
+                var response = await _authService.LogOutAccount(userId);
+
+                return response.Success ? Ok(response) : BadRequest(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocorreu um erro interno: {ex.Message}");
+            }
+        }
     }
 }
