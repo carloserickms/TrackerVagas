@@ -190,6 +190,8 @@ namespace App.Service
         {
             try
             {
+                List<AllModalityResponseDTO> allModality = new List<AllModalityResponseDTO>();
+
                 var modalityList = await _jobRepository.AllModality();
 
                 if (modalityList == null)
@@ -197,7 +199,16 @@ namespace App.Service
                     return _responseBuilder.NotFound("Nenhum dado foi encontrado!");
                 }
 
-                return _responseBuilder.OK(modalityList, "Dados encontrados com sucesso!");
+                foreach (var item in modalityList)
+                {
+                    allModality.Add(new AllModalityResponseDTO
+                    {
+                        id = item.Id,
+                        name = item.Name
+                    });
+                }
+
+                return _responseBuilder.OK(allModality, "Dados encontrados com sucesso!");
             }
             catch (Exception ex)
             {
