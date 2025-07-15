@@ -2,6 +2,7 @@ using App.DTOs;
 using App.Helper;
 using App.Models;
 using App.Repositories.Interfaces;
+using Org.BouncyCastle.Asn1;
 
 
 namespace App.Service
@@ -30,10 +31,20 @@ namespace App.Service
                 var modality = await _jobRepository.GetModalityById(JobDTO.modality);
                 var status = await _jobRepository.GetStatusById(JobDTO.status);
 
-                Console.WriteLine(modality);
-                Console.WriteLine(status);
-                Console.WriteLine(user);
+                if (user == null) 
+                {
+                    return _responseBuilder.Conflict($"Nenhuma referencia do objeto usuario encontrada");
+                }
 
+                if (modality == null) 
+                {
+                    return _responseBuilder.Conflict($"Nenhuma referencia do objeto modality encontrada");
+                }
+
+                if (status == null) 
+                {
+                    return _responseBuilder.Conflict($"Nenhuma referencia do objeto status encontrada");
+                }
 
                 JobVacancy job = new()
                 {
@@ -76,6 +87,35 @@ namespace App.Service
             }
         }
 
+        public async Task<ResponseDTO> UpdateJob(UpdateJobDTO updateJobDTO)
+        {
+            try
+            {
+                var job = await _jobRepository.GetById(updateJobDTO.jobId);
+
+                if (job == null)
+                {
+                    return _responseBuilder.Conflict("Vaga não encontrada!");
+                }
+
+                job.Title = updateJobDTO.title;
+                job.Link = updateJobDTO.link;
+                job.EnterpriseName = updateJobDTO.enterpriseName;
+                job.ModalityId = updateJobDTO.modality;
+                job.VacancyStatusId = updateJobDTO.status;
+                job.UpdatedAt = DateTime.Now;
+
+                await _jobRepository.Edit(job);
+
+                return _responseBuilder.OK(job, "Vaga editada com sucesso!");
+
+            }
+            catch (Exception ex)
+            {
+                return _responseBuilder.InternalError($"Ocorreu um erro interno: {ex.Message}");
+            }
+        }
+
         public async Task<ResponseDTO> GetAllById(SearchByIdDTO searchByIdDTO)
         {
             try
@@ -96,6 +136,7 @@ namespace App.Service
 
                     jobslist.Add(new JobResponseDTO
                     {
+                        id = item.Id,
                         title = item.Title,
                         link = item.Link,
                         enterpriseName = item.EnterpriseName,
