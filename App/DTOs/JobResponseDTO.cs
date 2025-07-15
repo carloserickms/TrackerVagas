@@ -2,6 +2,7 @@ namespace App.DTOs
 {
     public class JobResponseDTO
     {
+        public Guid id { get; set; }
         public string title { get; set; }
         public string link { get; set; }
         public string enterpriseName { get; set; }
