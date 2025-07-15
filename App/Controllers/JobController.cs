@@ -3,6 +3,7 @@ using App.Models;
 using App.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Mysqlx.Crud;
 
 namespace App.Controllers
 {
@@ -67,6 +68,30 @@ namespace App.Controllers
                 return StatusCode(500, $"Ocorreu um erro interno: {ex.Message}");
             }
         }
+
+        [HttpPut("Update-job")]
+        [Authorize]
+        public async Task<ActionResult> UpdateJob([FromBody] UpdateJobDTO updateJobDTO)
+        {
+            try
+            {
+                var tokenUserID = User.FindFirst("UserId")?.Value;
+
+                if (tokenUserID == null)
+                {
+                    return BadRequest($"Usuario sem autorização {tokenUserID}");
+                }
+
+                var response = await _jobService.UpdateJob(updateJobDTO);
+
+                return response.Success ? Ok(response) : BadRequest(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocorreu um erro interno: {ex.Message}");
+            }
+        }
+
 
         [HttpGet("get-all-jobs")]
         [Authorize]
