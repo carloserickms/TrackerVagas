@@ -68,5 +68,11 @@ namespace App.Repositories
         {
             return await _context.JobVacancy.FirstOrDefaultAsync(j => j.Id == id);
         }
+
+        public async override Task Edit(JobVacancy updatedJob)
+        {
+            _context.JobVacancy.Update(updatedJob);
+            await _context.SaveChangesAsync();
+        }
     }
 }
