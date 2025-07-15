@@ -21,6 +21,11 @@ namespace App.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public override async Task Edit(Session session)
+        {
+            throw new NotImplementedException();
+        }
+
         public override async Task<Session> GetById(Guid id)
         {
             return await _context.Session.FirstOrDefaultAsync(u => u.UserId == id);

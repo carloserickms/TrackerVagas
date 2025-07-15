@@ -41,5 +41,10 @@ namespace App.Repositories
         {
             await _context.SaveChangesAsync();
         }
+
+        public override async Task Edit(User user)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

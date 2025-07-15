@@ -6,5 +6,6 @@ namespace App.Repositories.Interfaces
         Task Add(T entity);
         Task<T> GetById(Guid id);
         Task Delete(T entity);
+        Task Edit(T entity);
     }
 }

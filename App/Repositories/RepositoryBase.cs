@@ -16,5 +16,6 @@ namespace App.Repositories
         public abstract Task Add(T entity);
         public abstract Task<T> GetById(Guid id);
         public abstract Task Delete(T entity);
+        public abstract Task Edit(T entity);
     }
 }

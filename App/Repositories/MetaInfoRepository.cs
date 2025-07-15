@@ -21,6 +21,11 @@ namespace App.Repositories
             throw new NotImplementedException();
         }
 
+        public override Task Edit(MetaInfo metaInfo)
+        {
+            throw new NotImplementedException();
+        }
+
         public override Task<MetaInfo> GetById(Guid id)
         {
             throw new NotImplementedException();
