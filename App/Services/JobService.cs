@@ -2,7 +2,6 @@ using App.DTOs;
 using App.Helper;
 using App.Models;
 using App.Repositories.Interfaces;
-using Org.BouncyCastle.Asn1;
 
 
 namespace App.Service
@@ -31,17 +30,17 @@ namespace App.Service
                 var modality = await _jobRepository.GetModalityById(JobDTO.modality);
                 var status = await _jobRepository.GetStatusById(JobDTO.status);
 
-                if (user == null) 
+                if (user == null)
                 {
                     return _responseBuilder.Conflict($"Nenhuma referencia do objeto usuario encontrada");
                 }
 
-                if (modality == null) 
+                if (modality == null)
                 {
                     return _responseBuilder.Conflict($"Nenhuma referencia do objeto modality encontrada");
                 }
 
-                if (status == null) 
+                if (status == null)
                 {
                     return _responseBuilder.Conflict($"Nenhuma referencia do objeto status encontrada");
                 }
@@ -66,15 +65,20 @@ namespace App.Service
             }
         }
 
-        public async Task<ResponseDTO> Delete(SearchByIdDTO searchByIdDTO)
+        public async Task<ResponseDTO> Delete(UserActionDTO userAction)
         {
             try
             {
-                var job = await _jobRepository.GetById(searchByIdDTO.Id);
+                var job = await _jobRepository.GetById(userAction.JobId);
 
                 if (job == null)
                 {
                     return _responseBuilder.Conflict("Vaga não encontrada!");
+                }
+
+                if (job.UserId != userAction.UserId)
+                {
+                    return _responseBuilder.Conflict("Usuário não possui permissão!");
                 }
 
                 await _jobRepository.Delete(job);
@@ -98,6 +102,11 @@ namespace App.Service
                     return _responseBuilder.Conflict("Vaga não encontrada!");
                 }
 
+                if (job.UserId != updateJobDTO.userId)
+                {
+                    return _responseBuilder.Conflict("Usuário não possui permissão!");
+                }
+
                 job.Title = updateJobDTO.title;
                 job.Link = updateJobDTO.link;
                 job.EnterpriseName = updateJobDTO.enterpriseName;
@@ -116,13 +125,13 @@ namespace App.Service
             }
         }
 
-        public async Task<ResponseDTO> GetAllById(SearchByIdDTO searchByIdDTO)
+        public async Task<ResponseDTO> GetAllById(Guid searchById)
         {
             try
             {
                 List<JobResponseDTO> jobslist = new List<JobResponseDTO>();
 
-                var jobs = await _jobRepository.GetAllById(searchByIdDTO.Id);
+                var jobs = await _jobRepository.GetAllById(searchById);
 
                 if (jobs == null)
                 {
@@ -148,6 +157,46 @@ namespace App.Service
                 }
 
                 return _responseBuilder.OK(jobslist, "Todos as vagas foram encontradas");
+            }
+            catch (Exception ex)
+            {
+                return _responseBuilder.InternalError($"Ocorreu um erro interno: {ex.Message}");
+            }
+        }
+
+        public async Task<ResponseDTO> GetJobById(UserActionDTO jobByIdDto)
+        {
+            try
+            {
+                var job = await _jobRepository.GetById(jobByIdDto.JobId);
+
+                if (job == null)
+                {
+                    return _responseBuilder.NotFound("Nenhuma vaga foi encontrada!");
+                }
+
+                if (job.UserId != jobByIdDto.UserId)
+                {
+                    return _responseBuilder.Conflict("Usuário não possui permissão!");
+                }
+
+                var status = await _jobRepository.GetStatusById(job.VacancyStatusId);
+                var modality = await _jobRepository.GetModalityById(job.ModalityId);
+
+                JobResponseDTO jobInfo = new()
+                {
+                    id = job.Id,
+                    title = job.Title,
+                    link = job.Link,
+                    enterpriseName = job.EnterpriseName,
+                    status = status.Name,
+                    modality = modality.Name,
+                    createdAt = job.CreatedAt,
+                    updatedAt = job.UpdatedAt
+                };
+
+
+                return _responseBuilder.OK(jobInfo, "Vaga encontrada com sucesso!");
             }
             catch (Exception ex)
             {
@@ -193,7 +242,7 @@ namespace App.Service
                 {
                     allStatus.Add(new AllStatusResponseDTO
                     {
-                        id =  item.Id,
+                        id = item.Id,
                         name = item.Name
                     });
                 }

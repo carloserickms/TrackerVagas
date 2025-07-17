@@ -3,7 +3,7 @@ using App.Models;
 using App.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Mysqlx.Crud;
+
 
 namespace App.Controllers
 {
@@ -47,11 +47,11 @@ namespace App.Controllers
 
         [HttpDelete("delete-job")]
         [Authorize]
-        public async Task<ActionResult> DeleteJob([FromBody] SearchByIdDTO searchByIdDTO)
+        public async Task<ActionResult> DeleteJob([FromQuery] Guid jobId)
         {
             try
             {
-                var tokenUserID = User.FindFirst("userId")?.Value;
+                var tokenUserID = User.FindFirst("UserId")?.Value;
 
                 if (tokenUserID == null)
                 {
@@ -59,7 +59,16 @@ namespace App.Controllers
                 }
 
                 var userId = Guid.Parse(tokenUserID);
-                var response = await _jobService.Delete(searchByIdDTO);
+
+                Console.WriteLine(userId);
+
+                UserActionDTO userAction = new()
+                {
+                    JobId = jobId,
+                    UserId = userId
+                };
+
+                var response = await _jobService.Delete(userAction);
 
                 return response.Success ? Ok(response) : BadRequest(response);
             }
@@ -69,7 +78,7 @@ namespace App.Controllers
             }
         }
 
-        [HttpPut("Update-job")]
+        [HttpPut("update-job")]
         [Authorize]
         public async Task<ActionResult> UpdateJob([FromBody] UpdateJobDTO updateJobDTO)
         {
@@ -81,6 +90,9 @@ namespace App.Controllers
                 {
                     return BadRequest($"Usuario sem autorização {tokenUserID}");
                 }
+
+                var userId = Guid.Parse(tokenUserID);
+                updateJobDTO.userId = userId;
 
                 var response = await _jobService.UpdateJob(updateJobDTO);
 
@@ -99,7 +111,32 @@ namespace App.Controllers
         {
             try
             {
-                SearchByIdDTO searchByIdDTO = new SearchByIdDTO();
+                var tokenUserID = User.FindFirst("UserId")?.Value;
+
+                if (tokenUserID == null)
+                {
+                    return BadRequest("Usuario sem autorização");
+                }
+
+                var userId = Guid.Parse(tokenUserID);
+
+                var response = await _jobService.GetAllById(userId);
+
+                return response.Success ? Ok(response) : BadRequest(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocorreu um erro interno: {ex.Message}");
+            }
+        }
+
+        [HttpGet("get-job-byId")]
+        [Authorize]
+        public async Task<ActionResult> GetJobById([FromQuery] Guid jobId)
+        {
+            try
+            {
+                Console.WriteLine(jobId);
 
                 var tokenUserID = User.FindFirst("UserId")?.Value;
 
@@ -109,8 +146,14 @@ namespace App.Controllers
                 }
 
                 var userId = Guid.Parse(tokenUserID);
-                searchByIdDTO.Id = userId;
-                var response = await _jobService.GetAllById(searchByIdDTO);
+
+                UserActionDTO JobUserID = new UserActionDTO
+                {
+                    JobId = jobId,
+                    UserId = userId
+                };
+
+                var response = await _jobService.GetJobById(JobUserID);
 
                 return response.Success ? Ok(response) : BadRequest(response);
             }
