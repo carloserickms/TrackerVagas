@@ -51,7 +51,8 @@ namespace App.Repositories
 
         public async override Task Delete(JobVacancy job)
         {
-            throw new NotImplementedException();
+            _context.JobVacancy.Remove(job);
+            await _context.SaveChangesAsync();
         }
 
         public Task<IEnumerable<JobVacancy>> GetAll()
