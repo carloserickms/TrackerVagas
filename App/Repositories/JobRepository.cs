@@ -46,12 +46,13 @@ namespace App.Repositories
 
         public async Task<VacancyStatus> GetStatusById(Guid statusId)
         {
-            return await _context.VacancyStatus.FirstAsync(s => s.Id == statusId);
+            return await _context.VacancyStatus.FirstOrDefaultAsync(s => s.Id == statusId);
         }
 
         public async override Task Delete(JobVacancy job)
         {
-            throw new NotImplementedException();
+            _context.JobVacancy.Remove(job);
+            await _context.SaveChangesAsync();
         }
 
         public Task<IEnumerable<JobVacancy>> GetAll()
@@ -67,6 +68,12 @@ namespace App.Repositories
         public async override Task<JobVacancy> GetById(Guid id)
         {
             return await _context.JobVacancy.FirstOrDefaultAsync(j => j.Id == id);
+        }
+
+        public async override Task Edit(JobVacancy updatedJob)
+        {
+            _context.JobVacancy.Update(updatedJob);
+            await _context.SaveChangesAsync();
         }
     }
 }

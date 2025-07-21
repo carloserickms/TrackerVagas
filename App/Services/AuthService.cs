@@ -117,16 +117,17 @@ namespace App.Service
         {
             try
             {
-                if (userDTO.provider == "google")
+                if (userDTO.provider != "google")
                 {
-                    var existingUser = await _userRepository.GetByEmail(userDTO.email);
+                    return _responseBuilder.Conflict("Provider não é reconhecido");
+                }
 
-                    if (existingUser != null)
-                    {
-                        return _responseBuilder.OK(existingUser, "Usuário inserido já possui cadastro!");
-                    }
+                var existingUser = await _userRepository.GetByEmail(userDTO.email);
 
-                    User newUser = new()
+                if (existingUser == null)
+                {
+                    // Criar novo usuário
+                    var newUser = new User
                     {
                         UserName = userDTO.userName,
                         Email = userDTO.email,
@@ -135,17 +136,90 @@ namespace App.Service
 
                     await _userRepository.Add(newUser);
 
-                    MetaInfo metaInfo = new(userDTO.providerId, userDTO.provider)
+                    var token = TokenService.GenerateToken(newUser);
+
+                    var session = new Session
+                    {
+                        UserId = newUser.Id,
+                        Token = token
+                    };
+
+                    await _sessionRepository.Add(session);
+
+                    var metaInfo = new MetaInfo(userDTO.providerId, userDTO.provider)
                     {
                         UserId = newUser.Id
                     };
 
                     await _metaInfoRepository.Add(metaInfo);
 
-                    return _responseBuilder.OKNoObject("Cadastro feito com sucesso.");
+                    var userLogin = new UserLoginDTO
+                    {
+                        Id = newUser.Id,
+                        Email = newUser.Email,
+                        UserName = newUser.UserName,
+                        Session = session,
+                        CreatedAt = newUser.CreatedAt,
+                        UpdatedAt = newUser.UpdatedAt
+                    };
+
+                    return _responseBuilder.OK(userLogin, "Usuário criado com sucesso!");
+                }
+                else
+                {
+                    // Usuário já existe — verifica se possui sessão
+                    var existingSession = await _sessionRepository.GetById(existingUser.Id);
+
+                    Console.WriteLine("SESSION:", existingSession);
+
+                    if (existingSession == null)
+                    {
+                        var token = TokenService.GenerateToken(existingUser);
+
+                        var session = new Session
+                        {
+                            UserId = existingUser.Id,
+                            Token = token
+                        };
+
+                        await _sessionRepository.Add(session);
+
+                        existingUser.Session = session;
+                    }
+
+                    var userLogin = new UserLoginDTO
+                    {
+                        Id = existingUser.Id,
+                        Email = existingUser.Email,
+                        UserName = existingUser.UserName,
+                        Session = existingUser.Session,
+                        CreatedAt = existingUser.CreatedAt,
+                        UpdatedAt = existingUser.UpdatedAt
+                    };
+
+                    return _responseBuilder.OK(userLogin, "Usuário já existe");
+                }
+            }
+            catch (Exception ex)
+            {
+                return _responseBuilder.InternalError($"Ocorreu um erro interno: {ex.Message}");
+            }
+        }
+
+        public async Task<ResponseDTO> LogOutAccount(Guid userId)
+        {
+            try
+            {
+                var session = await _sessionRepository.GetById(userId);
+
+                if (session == null)
+                {
+                    return _responseBuilder.Conflict("Sessão não existe!");
                 }
 
-                return _responseBuilder.Conflict("Provider não é reconhecido");
+                await _sessionRepository.Delete(session);
+
+                return _responseBuilder.OKNoObject("Usuário deslogado do sistema com sucesso!");
             }
             catch (Exception ex)
             {
