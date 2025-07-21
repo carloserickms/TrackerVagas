@@ -183,18 +183,17 @@ namespace App.Service
                 var status = await _jobRepository.GetStatusById(job.VacancyStatusId);
                 var modality = await _jobRepository.GetModalityById(job.ModalityId);
 
-                JobResponseDTO jobInfo = new()
+                JobResponseByIdDTO jobInfo = new()
                 {
                     id = job.Id,
                     title = job.Title,
                     link = job.Link,
                     enterpriseName = job.EnterpriseName,
-                    status = status.Name,
-                    modality = modality.Name,
+                    status = status.Id,
+                    modality = modality.Id,
                     createdAt = job.CreatedAt,
                     updatedAt = job.UpdatedAt
                 };
-
 
                 return _responseBuilder.OK(jobInfo, "Vaga encontrada com sucesso!");
             }
