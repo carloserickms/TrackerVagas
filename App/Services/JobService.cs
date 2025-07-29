@@ -207,14 +207,34 @@ namespace App.Service
         {
             try
             {
-                var job = await _jobRepository.GetJobByTitle(search);
+                List<JobResponseDTO> jobslist = new List<JobResponseDTO>();
 
-                if (job == null)
+                var jobs = await _jobRepository.GetJobByTitle(search);
+
+                if (jobs == null)
                 {
                     return _responseBuilder.NotFound("Nenhuma vaga foi encontrada!");
                 }
 
-                return _responseBuilder.OK(job, "Vagas encontradas com sucesso!");
+                foreach (var item in jobs)
+                {
+                    var status = await _jobRepository.GetStatusById(item.VacancyStatusId);
+                    var modality = await _jobRepository.GetModalityById(item.ModalityId);
+
+                    jobslist.Add(new JobResponseDTO
+                    {
+                        id = item.Id,
+                        title = item.Title,
+                        link = item.Link,
+                        enterpriseName = item.EnterpriseName,
+                        status = status.Name,
+                        modality = modality.Name,
+                        createdAt = item.CreatedAt,
+                        updatedAt = item.UpdatedAt
+                    });
+                }
+
+                return _responseBuilder.OK(jobslist, "Vagas encontradas com sucesso!");
             }
             catch (Exception ex)
             {
