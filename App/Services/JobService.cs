@@ -203,6 +203,25 @@ namespace App.Service
             }
         }
 
+        public async Task<ResponseDTO> GetJobByTitle(SearchForUserJobs search)
+        {
+            try
+            {
+                var job = await _jobRepository.GetJobByTitle(search);
+
+                if (job == null)
+                {
+                    return _responseBuilder.NotFound("Nenhuma vaga foi encontrada!");
+                }
+
+                return _responseBuilder.OK(job, "Vagas encontradas com sucesso!");
+            }
+            catch (Exception ex)
+            {
+                return _responseBuilder.InternalError($"Ocorreu um erro interno: {ex.Message}");
+            }
+        }
+
         public async Task<ResponseDTO> CreateStatus(TypesDTO typesDTO)
         {
             try

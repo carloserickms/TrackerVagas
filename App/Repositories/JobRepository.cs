@@ -1,4 +1,7 @@
+using System.Configuration;
+using System.Diagnostics;
 using App.DataBase;
+using App.DTOs;
 using App.Models;
 using App.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -74,6 +77,11 @@ namespace App.Repositories
         {
             _context.JobVacancy.Update(updatedJob);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<JobVacancy>> GetJobByTitle(SearchForUserJobs search)
+        {
+            return await _context.JobVacancy.Where(j => j.UserId == search.UserId && j.Title.Contains(search.JobTitle)).ToListAsync();
         }
     }
 }

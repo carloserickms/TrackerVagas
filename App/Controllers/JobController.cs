@@ -163,6 +163,37 @@ namespace App.Controllers
             }
         }
 
+        [HttpGet("get-job-bytitle")]
+        [Authorize]
+        public async Task<ActionResult> GetJobByTitle([FromQuery] string title)
+        {
+            try
+            {
+                var tokenUserID = User.FindFirst("UserId")?.Value;
+
+                if (tokenUserID == null)
+                {
+                    return BadRequest("Usuario sem autorização");
+                }
+
+                var userId = Guid.Parse(tokenUserID);
+
+                SearchForUserJobs searchForUserJobs = new()
+                {
+                    UserId = userId,
+                    JobTitle = title
+                };
+
+                var response = await _jobService.GetJobByTitle(searchForUserJobs);
+
+                return response.Success ? Ok(response) : BadRequest(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocorreu um erro interno: {ex.Message}");
+            }
+        }
+
         [HttpGet("get-all-status")]
         [Authorize]
         public async Task<ActionResult> GetAllStatus()
