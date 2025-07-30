@@ -1,4 +1,6 @@
 using App.Config;
+using App.DataBase;
+using Microsoft.EntityFrameworkCore;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,4 +29,15 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.MapGet("/health", () => Results.Ok("API is healthy and ready!"));
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    context.Database.Migrate();
+    StatusTableSeed.Seed(context);
+    ModalityTableSeed.Seed(context);
+}
+
 app.Run();
+
