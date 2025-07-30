@@ -3,8 +3,8 @@ version: '3.8'
 services:
   api:
     build:
-      context: .
-      dockerfile: App/Dockerfile
+      context: App/
+      dockerfile: Dockerfile
     ports:
       - "8080:80"
     env_file:
