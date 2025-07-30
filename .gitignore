@@ -26,12 +26,15 @@ global.json
 packages/
 project.lock.json
 
-# Next.js / Node.js
+# Node.js
 node_modules/
 .next/
 out/
-*.env*
+
+# Environment variables
+.env*
 .env
+!.env.example
 
 # Logs
 yarn-debug.log
@@ -47,3 +50,9 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
+
+# Docker
+docker-compose.yml
+docker-compose.*.yml
+!App/Dockerfile
+.dockerignore
