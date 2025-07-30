@@ -11,11 +11,17 @@ namespace App.Service
     {
         public static string GenerateToken(User user)
         {
+
+            //para rodar sem docker localmente
+            /*
             var envVars = DotEnv.Read();
             string SecretKey = envVars["SECRETKEY"];
+            */
+            
+            string secretKey = Environment.GetEnvironmentVariable("SECRETKEY");
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(SecretKey);
+            var key = Encoding.ASCII.GetBytes(secretKey);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]

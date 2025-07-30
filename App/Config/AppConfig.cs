@@ -12,16 +12,24 @@ namespace App.Config
     {
         public static void StartDependencies(WebApplicationBuilder builder)
         {
+            //rodando localmente sem docker 
+            /*
             var envVars = DotEnv.Read();
             string connectionString = envVars["DATABASECONNECTION"];
             string SecretKey = envVars["SECRETKEY"];
+            */
+
+            //configurando para rodar com o docker
+            string connectionString = Environment.GetEnvironmentVariable("DATABASECONNECTION");
+            string secretKey = Environment.GetEnvironmentVariable("SECRETKEY");
+
 
             try
             {
                 ConfigureDataBase(builder.Services, connectionString);
                 ConfigureRepositories(builder.Services);
                 CORSConfig.ConfigureCORS(builder.Services);
-                JWTConfig.ConfigureJWT(builder.Services, SecretKey);
+                JWTConfig.ConfigureJWT(builder.Services, secretKey);
 
                 builder.Services.AddControllers();
 
