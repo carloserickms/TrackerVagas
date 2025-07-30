@@ -8,13 +8,15 @@ services:
     ports:
       - "8080:80"
     env_file:
-      - .env
-    depends_on:
-      db:
-        condition: service_healthy
+      - .env # Continuamos carregando as variáveis de ambiente, incluindo a nova DATABASECONNECTION
+    # Não precisamos mais de depends_on para o DB, pois ele é externo
+    # depends_on:
+    #   db:
+    #     condition: service_healthy
     working_dir: /app
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:80/health"]
       interval: 10s
@@ -22,22 +24,24 @@ services:
       retries: 5
       start_period: 20s
 
-  db:
-    image: mysql:8.0
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-    ports:
-      - "3307:3306"
-    volumes:
-      - mysql-data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "sh", "-c", "mysql -u root -p${MYSQL_ROOT_PASSWORD} -h 127.0.0.1 -P 3306 -e 'SELECT 1;'"]
-      interval: 5s
-      timeout: 20s
-      retries: 15
-      start_period: 60s
+# Removemos o serviço 'db' completo
+# db:
+#   image: mysql:8.0
+#   restart: always
+#   environment:
+#     MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+#     MYSQL_DATABASE: ${MYSQL_DATABASE}
+#   ports:
+#     - "3307:3306"
+#   volumes:
+#     - mysql-data:/var/lib/mysql
+#   healthcheck:
+#     test: ["CMD", "sh", "-c", "mysql -u root -p${MYSQL_ROOT_PASSWORD} -h 127.0.0.1 -P 3306 -e 'SELECT 1;'"]
+#     interval: 5s
+#     timeout: 20s
+#     retries: 15
+#     start_period: 60s
 
-volumes:
-  mysql-data:
+# Removemos o volume 'mysql-data'
+# volumes:
+#   mysql-data:
