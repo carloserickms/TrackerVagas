@@ -1,0 +1,5 @@
+ASPNETCORE_ENVIRONMENT=Development
+DATABASECONNECTION=Server=db;Port=3306;Database=TrackerVagasdb;UserId=YourUser;Password=PassWord
+SECRETKEY=SecretKeyWith216bits
+MYSQL_ROOT_PASSWORD=PassWord
+MYSQL_DATABASE=TrackerVagasdb
