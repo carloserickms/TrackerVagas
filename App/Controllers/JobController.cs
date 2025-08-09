@@ -107,7 +107,7 @@ namespace App.Controllers
 
         [HttpGet("get-all-jobs")]
         [Authorize]
-        public async Task<ActionResult> GetAllById()
+        public async Task<ActionResult> GetAllById([FromQuery] int page)
         {
             try
             {
@@ -120,7 +120,13 @@ namespace App.Controllers
 
                 var userId = Guid.Parse(tokenUserID);
 
-                var response = await _jobService.GetAllById(userId);
+                UserPageRequestDTO userPage = new UserPageRequestDTO
+                {
+                    userId = userId,
+                    page = page
+                };
+
+                var response = await _jobService.GetAllById(userPage);
 
                 return response.Success ? Ok(response) : BadRequest(response);
             }
