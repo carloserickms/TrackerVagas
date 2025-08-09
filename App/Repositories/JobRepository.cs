@@ -63,9 +63,23 @@ namespace App.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<JobVacancy>> GetAllById(Guid jobId)
+        public async Task<IEnumerable<JobVacancy>> GetAllById(UserPageRequestDTO userPage)
         {
-            return await _context.JobVacancy.Where(j => j.UserId == jobId).ToListAsync();
+            {
+                const int maxPage = 9;
+                int skip = (userPage.page - 1) * maxPage;
+
+                var paginatedList = await _context.JobVacancy
+                    .Where(j => j.UserId == userPage.userId)
+                    .Skip(skip)
+                    .Take(maxPage)
+                    .ToListAsync();
+
+                return paginatedList;
+            }
+
+            //return await _context.JobVacancy.Where(j => j.UserId == userPage.userId).ToListAsync();
+
         }
 
         public async override Task<JobVacancy> GetById(Guid id)

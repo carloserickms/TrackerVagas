@@ -125,13 +125,13 @@ namespace App.Service
             }
         }
 
-        public async Task<ResponseDTO> GetAllById(Guid searchById)
+        public async Task<ResponseDTO> GetAllById(UserPageRequestDTO userPage)
         {
             try
             {
                 List<JobResponseDTO> jobslist = new List<JobResponseDTO>();
 
-                var jobs = await _jobRepository.GetAllById(searchById);
+                var jobs = await _jobRepository.GetAllById(userPage);
 
                 if (jobs == null)
                 {
