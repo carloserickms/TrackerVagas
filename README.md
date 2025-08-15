@@ -43,7 +43,7 @@ Like a spreadsheet, **you’re in control**: no unnecessary fields, no forced in
 ---
 
 ## 🌐 Frontend
-Coming soon: [FRONTEND](https://github.com/carloserickms/TrackerVagas-frontend)
+Repository: https://github.com/carloserickms/TrackerVagas-frontend
 
 ## 🚀 How to Run the Project
 
@@ -56,22 +56,16 @@ git clone https://github.com/your-username/TrackerVagas-Backend.git
 ```bash
 cd TrackerVagas/App
 ```
-3. **Restore dependencies**
+3. **Create a .env file in the project root and add the following keys**
 ```bash
-dotnet restore
+DATABASECONNECTION
+MYSQL_ROOT_PASSWORD
+MYSQL_DATABASE
+SECRETKEY
 ```
-4. **Create a .env file in the project root and add the following keys**
+4. **Run docker compose**
 ```bash
-DATABASECONNECTION = "Server=localhost;Database=TrackerVagasdb;User Id="SEU USUARIO";Password="SUA SENHA""
-SECRETKEY = "CREATE_YOUR_SECRET_KEY"
-```
-5. **Apply the database migrations**
-```bash
-dotnet ef database update
-```
-6. **Run the server**
-```bash
-dotnet run
+docker compose up --build
 ```
 ---
 ## 👤 Author
