@@ -139,7 +139,7 @@ namespace App.Controllers
             }
         }
 
-        [HttpPost("logout")]
+        [HttpDelete("logout")]
         [Authorize]
         public async Task<ActionResult> Logout()
         {

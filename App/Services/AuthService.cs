@@ -126,7 +126,6 @@ namespace App.Service
 
                 if (existingUser == null)
                 {
-                    // Criar novo usuário
                     var newUser = new User
                     {
                         UserName = userDTO.userName,
@@ -167,7 +166,6 @@ namespace App.Service
                 }
                 else
                 {
-                    // Usuário já existe — verifica se possui sessão
                     var existingSession = await _sessionRepository.GetById(existingUser.Id);
 
                     Console.WriteLine("SESSION:", existingSession);
