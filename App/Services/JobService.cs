@@ -343,5 +343,44 @@ namespace App.Service
                 return _responseBuilder.InternalError($"Ocorreu um erro interno: {ex.Message}");
             }
         }
+
+        public async Task<ResponseDTO> GetModalityById(ModalityIdUserIdRequestDTO modalityIdUserId)
+        {
+            try
+            {
+                List<JobResponseDTO> jobList = new List<JobResponseDTO>();
+
+                var jobs = await _jobRepository.GetJobByModality(modalityIdUserId);
+
+                if (jobs == null)
+                {
+                    return _responseBuilder.NotFound("Nenhum dado foi encontrado!");
+                }
+
+                foreach (var item in jobs)
+                {
+                    var status = await _jobRepository.GetStatusById(item.VacancyStatusId);
+                    var modality = await _jobRepository.GetModalityById(item.ModalityId);
+
+                    jobList.Add(new JobResponseDTO
+                    {
+                        id = item.Id,
+                        title = item.Title,
+                        link = item.Link,
+                        enterpriseName = item.EnterpriseName,
+                        status = status.Name,
+                        modality = modality.Name,
+                        createdAt = item.CreatedAt,
+                        updatedAt = item.UpdatedAt
+                    });
+                }
+
+                return _responseBuilder.OK(jobList, "Vagas encontradas com sucesso!");
+            }
+            catch (Exception ex)
+            {
+                return _responseBuilder.InternalError($"Ocorreu um erro interno: {ex.Message}");
+            }
+        }
     }
 }

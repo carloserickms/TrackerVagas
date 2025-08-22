@@ -2,7 +2,7 @@ using App.Models;
 
 namespace App.Repositories.Interfaces
 {
-    public interface IJobRepository : IRepository<JobVacancy>, IGetAll<JobVacancy>, IGetAllById<JobVacancy>, IGetJobByTitle<JobVacancy>
+    public interface IJobRepository : IRepository<JobVacancy>, IGetAll<JobVacancy>, IGetAllById<JobVacancy>, IGetJobByTitle<JobVacancy>, IGetJobByModality<JobVacancy>
     {
         Task Add(JobVacancy entity);
         Task<JobVacancy> GetById(Guid id);

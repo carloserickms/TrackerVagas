@@ -97,5 +97,15 @@ namespace App.Repositories
         {
             return await _context.JobVacancy.Where(j => j.UserId == search.UserId && j.Title.Contains(search.JobTitle)).ToListAsync();
         }
+
+        public async Task<IEnumerable<JobVacancy>> GetJobByModality(ModalityIdUserIdRequestDTO modalityIdUserId)
+        {
+            var modalityList = await _context.JobVacancy
+                .Where(j => j.UserId == modalityIdUserId.UserId
+                    && j.ModalityId == modalityIdUserId.ModalityId)
+                .ToListAsync();
+
+            return modalityList;
+        }
     }
 }

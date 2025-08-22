@@ -263,5 +263,37 @@ namespace App.Controllers
                 return StatusCode(500, $"Ocorreu um erro interno: {ex.Message}");
             }
         }
+
+        [HttpGet("get-modality-byid")]
+        [Authorize]
+        public async Task<ActionResult> GetModalityById([FromQuery] Guid modalityId)
+        {
+            try
+            {
+                var tokenUserID = User.FindFirst("UserId")?.Value;
+
+                if (tokenUserID == null)
+                {
+                    return BadRequest("Usuario sem autorização");
+                }
+
+                var userId = Guid.Parse(tokenUserID);
+
+                ModalityIdUserIdRequestDTO modalityIdUserId = new()
+                {
+                    ModalityId = modalityId,
+                    UserId = userId
+                };
+
+                var response = await _jobService.GetModalityById(modalityIdUserId);
+
+                return response.Success ? Ok(response) : BadRequest(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocorreu um erro interno: {ex.Message}");
+            }
+        }
+
     }
 }
