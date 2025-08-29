@@ -1,5 +1,3 @@
-using System.Configuration;
-using System.Diagnostics;
 using App.DataBase;
 using App.DTOs;
 using App.Models;
@@ -36,6 +34,8 @@ namespace App.Repositories
             return await _context.Modality.ToListAsync();
         }
 
+        
+
         public async Task AddModality(Modality modality)
         {
             _context.Modality.Add(modality);
@@ -66,7 +66,7 @@ namespace App.Repositories
         public async Task<IEnumerable<JobVacancy>> GetAllById(UserPageRequestDTO userPage)
         {
             {
-                const int maxPage = 9;
+                const int maxPage = 6;
                 int skip = (userPage.page - 1) * maxPage;
 
                 var paginatedList = await _context.JobVacancy
@@ -106,6 +106,26 @@ namespace App.Repositories
                 .ToListAsync();
 
             return modalityList;
+        }
+
+        public async Task<TypeOfContract> GetTypeOfContract(Guid id)
+        {
+            return await _context.TypeOfContract.FirstAsync(t => t.Id == id);
+        }
+
+        public async Task<InterestLevel> GetInterestLevel(Guid id)
+        {
+            return await _context.InterestLevel.FirstAsync(i => i.Id == id);
+        }
+
+        public async Task<IEnumerable<TypeOfContract>> AllTypeOfContract()
+        {
+            return await _context.TypeOfContract.ToListAsync();
+        }
+
+        public async Task<IEnumerable<InterestLevel>> AllInterestLevel()
+        {
+            return await _context.InterestLevel.ToListAsync();
         }
     }
 }
