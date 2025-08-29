@@ -37,6 +37,8 @@ using (var scope = app.Services.CreateScope())
     context.Database.Migrate();
     StatusTableSeed.Seed(context);
     ModalityTableSeed.Seed(context);
+    InterestLevelSeed.Seed(context);
+    TypeOfContractSeed.Seed(context);
 }
 
 app.Run();

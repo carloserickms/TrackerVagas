@@ -13,7 +13,8 @@ namespace App.DataBase
         public DbSet<VacancyStatus> VacancyStatus { get; set; }
         public DbSet<MetaInfo> MetaInfo { get; set; }
         public DbSet<Modality> Modality {get; set;}
-
+        public DbSet<InterestLevel> InterestLevel { get; set; }
+        public DbSet<TypeOfContract> TypeOfContract { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -29,6 +30,10 @@ namespace App.DataBase
             .HasKey(m => m.Id);
             modelBuilder.Entity<MetaInfo>()
             .HasKey(mi => mi.ProviderId);
+            modelBuilder.Entity<InterestLevel>()
+            .HasKey(il => il.Id);
+            modelBuilder.Entity<TypeOfContract>()
+            .HasKey(tc => tc.Id);
 
             modelBuilder.Entity<User>()
             .HasIndex(u => u.UserName).IsUnique();
@@ -49,6 +54,16 @@ namespace App.DataBase
             .HasOne(j => j.Modality)
             .WithMany(m => m.JobVacancy)
             .HasForeignKey(j => j.ModalityId);
+
+            modelBuilder.Entity<JobVacancy>()
+            .HasOne(j => j.InterestLevel)
+            .WithMany(il => il.JobVacancy)
+            .HasForeignKey(j => j.InterestLevelId);
+
+            modelBuilder.Entity<JobVacancy>()
+            .HasOne(j => j.TypeOfContract)
+            .WithMany(tc => tc.JobVacancy)
+            .HasForeignKey(j => j.TypeOfContractId);
 
             modelBuilder.Entity<User>()
             .HasMany(u => u.JobVacancy)

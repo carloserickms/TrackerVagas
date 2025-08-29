@@ -10,6 +10,11 @@ namespace App.DTOs
         public string link {get; set;}
         [Required]
         public string enterpriseName {get; set;}
+        public string? location { get; set; }
+        public float? salary { get; set; }
+        public float? workload { get; set; }
+        public Guid? typeOfContract { get; set; }
+        public Guid? interestLevel { get; set; }
         [Required]
         public Guid status {get; set;}
         [Required]
