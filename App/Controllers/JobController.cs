@@ -295,5 +295,36 @@ namespace App.Controllers
             }
         }
 
+        [HttpGet("get-all-interestLevel")]
+        [Authorize]
+        public async Task<ActionResult> GetAllInterestLevel()
+        {
+            try
+            {
+                var response = await _jobService.GetAllInterestLevel();
+
+                return response.Success ? Ok(response) : BadRequest(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocorreu um erro interno: {ex.Message}");
+            }
+        }
+
+        [HttpGet("get-all-typeofcontract")]
+        [Authorize]
+        public async Task<ActionResult> GetAllTypeOfContract()
+        {
+            try
+            {
+                var response = await _jobService.GetAllTypeOfContract();
+
+                return response.Success ? Ok(response) : BadRequest(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocorreu um erro interno: {ex.Message}");
+            }
+        }
     }
 }
