@@ -12,17 +12,11 @@ namespace App.Config
     {
         public static void StartDependencies(WebApplicationBuilder builder)
         {
-            //rodando localmente sem docker 
-            /*
-            var envVars = DotEnv.Read();
-            string connectionString = envVars["DATABASECONNECTION"];
-            string SecretKey = envVars["SECRETKEY"];
-            */
+            //rodando localmente sem docker coloque o dotenv dentro de app e mude de db para localhost no env
+            // DotEnv.Load(options: new DotEnvOptions(probeForEnv: true));
 
-            //configurando para rodar com o docker
             string connectionString = Environment.GetEnvironmentVariable("DATABASECONNECTION");
             string secretKey = Environment.GetEnvironmentVariable("SECRETKEY");
-
 
             try
             {
