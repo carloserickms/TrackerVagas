@@ -39,9 +39,12 @@ namespace App.Config
 
         public static void ConfigureDataBase(IServiceCollection services, string connectionString)
         {
+            var serverVersion = new MySqlServerVersion(new Version(8, 0, 34));
+
             services.AddDbContext<AppDbContext>(options =>
-                options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+                options.UseMySql(connectionString, serverVersion));
         }
+
 
         public static void ConfigureRepositories(IServiceCollection services)
         {
