@@ -45,7 +45,7 @@ namespace App.Repositories
         public async Task<Modality> GetModalityById(Guid modalityId)
         {
             return await _context.Modality.FirstAsync(m => m.Id == modalityId);
-        }
+        } 
 
         public async Task<VacancyStatus> GetStatusById(Guid statusId)
         {
