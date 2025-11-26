@@ -1,0 +1,15 @@
+name: Ping Health Endpoint
+
+on:
+  schedule:
+    - cron: "*/1 * * * *" # a cada 1 minuto
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call /health endpoint
+        run: |
+          echo "Calling /health..."
+          curl -s -o /dev/null -w "%{http_code}\n" https://trackervagas.vercel.app/health
